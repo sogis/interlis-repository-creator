@@ -42,7 +42,7 @@ pluginBundle {
     tags = ['interlis', 'gis', 'sdi', 'geo', 'geoinformation', 'interlis', 'repository'] 
     
     plugins { 
-        gretlPlugin {  
+        interlisRepositoryCreatorPlugin {  
             displayName = 'INTERLIS Repository Creator' 
             description = 'The Gradle INTERLIS Repository Creator plugin creates an ilimodel.xml file from a bunch of INTERLIS models.' 
         }
@@ -52,7 +52,7 @@ pluginBundle {
 task setupPluginUpload() {
     description = "Converts Gradle plugin publish key and secret from environment variable to system property. (Workaround)"
     doLast {
-        def key=System.env.gradlePublishKey
+        def key = System.env.gradlePublishKey
         def secret = System.env.gradlePublishSecret
     
         if( !key || !secret)
