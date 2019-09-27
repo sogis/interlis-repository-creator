@@ -9,3 +9,10 @@ branches:
 
 script:
   - ./gradlew --no-daemon clean build
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: ./gradlew --no-daemon publishPlugins
+    on:
+      branch: master
