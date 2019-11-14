@@ -12,6 +12,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -51,9 +52,13 @@ public class InterlisRepositoryCreatorPluginTest {
         
         writeFile(buildFile, buildFileContent);
 
+        BufferedWriter log = new BufferedWriter(new OutputStreamWriter(System.out));
+        
         BuildResult result = GradleRunner.create()
             .withProjectDir(testProjectDir.getRoot())
             .withArguments("createIliModelsXml")
+//            .withDebug(true)
+            .forwardStdOutput(log)
             .withPluginClasspath()
             .build();
 
@@ -63,7 +68,8 @@ public class InterlisRepositoryCreatorPluginTest {
         
         assertThat(resultString, containsString("<Name>SO_MOpublic_20180221</Name>"));
         assertThat(resultString, containsString("<Name>DM01AVSO24LV95</Name>"));
-        assertThat(resultString, containsString("<Name>SO_Nutzungsplanung_20171118</Name>"));        
+        assertThat(resultString, containsString("<Name>SO_Nutzungsplanung_20171118</Name>"));       
+        assertThat(resultString, containsString("<Name>SO_AWJF_Waldpflege_Erfassung_20191112</Name>"));               
     }
 
     private void writeFile(File destination, String content) throws IOException {

@@ -66,3 +66,8 @@ task setupPluginUpload() {
 }
 tasks.publishPlugins.dependsOn tasks.setupPluginUpload
 
+test {
+    testLogging {
+        events 'standard_out', 'standard_error'
+    }
+}

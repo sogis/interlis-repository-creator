@@ -11,12 +11,14 @@ import java.util.Iterator;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import org.gradle.internal.impldep.org.junit.platform.commons.logging.LoggerFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -35,7 +37,8 @@ import ch.interlis.iom_j.xtf.XtfWriter;
 import ch.interlis.ili2c.metamodel.Model;
 
 public class InterlisRepositoryCreator extends DefaultTask {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+//    private Logger log = LoggerFactory.getLogger(this.getClass());
+    private Logger log = Logging.getLogger(this.getClass());
     
     private TransferDescription tdRepository = null;
     private IoxWriter ioxWriter = null;
@@ -83,59 +86,61 @@ public class InterlisRepositoryCreator extends DefaultTask {
         IOFileFilter iliFilter = new SuffixFileFilter(iliExt, IOCase.INSENSITIVE);
         Iterator<File> it = FileUtils.iterateFiles(modelsDir, iliFilter, TrueFileFilter.INSTANCE);
         int i = 1;
+        
         while (it.hasNext()) {
-            File file = it.next();
-
+            File file = it.next();            
             TransferDescription td = getTransferDescriptionFromFileName(file.getAbsolutePath());            
-            Model lastModel = td.getLastModel();
-
-            Iom_jObject iomObj = new Iom_jObject(ILI_CLASS, String.valueOf(i));
-            iomObj.setattrvalue("Name", lastModel.getName());
+//            Model lastModel = td.getLastModel();
             
-            if (lastModel.getIliVersion().equalsIgnoreCase("1")) {
-                iomObj.setattrvalue("SchemaLanguage", "ili1");
-            } else if (lastModel.getIliVersion().equalsIgnoreCase("2.2")) {
-                iomObj.setattrvalue("SchemaLanguage", "ili2_2");
-            } else if (lastModel.getIliVersion().equalsIgnoreCase("2.3")) {
-                iomObj.setattrvalue("SchemaLanguage", "ili2_3");
-            }
-            
-            // TODO: Can this be done more sophisticated?
-            String filePath = file.getAbsoluteFile().getParent().replace(modelsDir.getAbsolutePath()+FileSystems.getDefault().getSeparator(), "");
-            iomObj.setattrvalue("File", filePath + "/" + file.getName());
+            for (Model lastModel : td.getModelsFromLastFile()) {
+                Iom_jObject iomObj = new Iom_jObject(ILI_CLASS, String.valueOf(i));
+                iomObj.setattrvalue("Name", lastModel.getName());
+                
+                if (lastModel.getIliVersion().equalsIgnoreCase("1")) {
+                    iomObj.setattrvalue("SchemaLanguage", "ili1");
+                } else if (lastModel.getIliVersion().equalsIgnoreCase("2.2")) {
+                    iomObj.setattrvalue("SchemaLanguage", "ili2_2");
+                } else if (lastModel.getIliVersion().equalsIgnoreCase("2.3")) {
+                    iomObj.setattrvalue("SchemaLanguage", "ili2_3");
+                }
+                
+                // TODO: Can this be done more sophisticated?
+                String filePath = file.getAbsoluteFile().getParent().replace(modelsDir.getAbsolutePath()+FileSystems.getDefault().getSeparator(), "");
+                iomObj.setattrvalue("File", filePath + "/" + file.getName());
 
-            if (lastModel.getModelVersion() == null) {
-                iomObj.setattrvalue("Version", "2000-01-01");
-            } else {
-                iomObj.setattrvalue("Version", lastModel.getModelVersion());
-            }
+                if (lastModel.getModelVersion() == null) {
+                    iomObj.setattrvalue("Version", "2000-01-01");
+                } else {
+                    iomObj.setattrvalue("Version", lastModel.getModelVersion());
+                }
 
-            // TODO: We could use meta attributes for title and shortDescription.
-            // log.info(lastModel.getMetaValue("Title"));
-            // log.info(lastModel.getMetaValue("shortDescription"));
-            
-            try {
-                iomObj.setattrvalue("Issuer", lastModel.getIssuer());
-            } catch (IllegalArgumentException e) {
-                // do nothing
-            }
-            // iomObj.setattrvalue("technicalContact", "mailto:agi@bd.so.ch");
-            // iomObj.setattrvalue("furtherInformation", "https://geo.so.ch");
+                // TODO: We could use meta attributes for title and shortDescription.
+                // log.info(lastModel.getMetaValue("Title"));
+                // log.info(lastModel.getMetaValue("shortDescription"));
+                
+                try {
+                    iomObj.setattrvalue("Issuer", lastModel.getIssuer());
+                } catch (IllegalArgumentException e) {
+                    // do nothing
+                }
+                // iomObj.setattrvalue("technicalContact", "mailto:agi@bd.so.ch");
+                // iomObj.setattrvalue("furtherInformation", "https://geo.so.ch");
 
-            try (InputStream is = Files.newInputStream(Paths.get(file.getAbsolutePath()))) {
-                String md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(is);
-                iomObj.setattrvalue("md5", md5);
-            }
+                try (InputStream is = Files.newInputStream(Paths.get(file.getAbsolutePath()))) {
+                    String md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(is);
+                    iomObj.setattrvalue("md5", md5);
+                }
 
-            // dependsOnModel
-            for (Model model : lastModel.getImporting()) {
-                Iom_jObject iomObjDependsOnModel = new Iom_jObject(ILI_STRUCT_MODELNAME, null);
-                iomObjDependsOnModel.setattrvalue("value",  model.getName());
-                iomObj.addattrobj("dependsOnModel", iomObjDependsOnModel);
+                // dependsOnModel
+                for (Model model : lastModel.getImporting()) {
+                    Iom_jObject iomObjDependsOnModel = new Iom_jObject(ILI_STRUCT_MODELNAME, null);
+                    iomObjDependsOnModel.setattrvalue("value",  model.getName());
+                    iomObj.addattrobj("dependsOnModel", iomObjDependsOnModel);
+                }
+                
+                ioxWriter.write(new ch.interlis.iox_j.ObjectEvent(iomObj));   
+                i++;                
             }
-            
-            ioxWriter.write(new ch.interlis.iox_j.ObjectEvent(iomObj));
-            i++;
         }
         
         ioxWriter.write(new ch.interlis.iox_j.EndBasketEvent());
@@ -170,7 +175,7 @@ public class InterlisRepositoryCreator extends DefaultTask {
         ilifiles.add(fileName);
         Configuration config = manager.getConfigWithFiles(ilifiles);
         ch.interlis.ili2c.metamodel.TransferDescription iliTd = Ili2c.runCompiler(config);
-        
+                
         if (iliTd == null) {
             throw new IllegalArgumentException("INTERLIS compiler failed");
         }
