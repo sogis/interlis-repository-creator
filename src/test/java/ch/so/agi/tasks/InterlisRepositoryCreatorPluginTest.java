@@ -65,13 +65,12 @@ public class InterlisRepositoryCreatorPluginTest {
         assertEquals(SUCCESS, result.task(":createIliModelsXml").getOutcome());
         
         String resultString = new String(Files.readAllBytes(Paths.get(testProjectDir.getRoot().getAbsolutePath()+FileSystems.getDefault().getSeparator()+"ilimodels.xml")), StandardCharsets.UTF_8);
-        
-        System.out.println(resultString);
-        
+                
         assertThat(resultString, containsString("<Name>SO_MOpublic_20180221</Name>"));
         assertThat(resultString, containsString("<Name>DM01AVSO24LV95</Name>"));
         assertThat(resultString, containsString("<Name>SO_Nutzungsplanung_20171118</Name>"));       
         assertThat(resultString, containsString("<Name>SO_AWJF_Waldpflege_Erfassung_20191112</Name>"));               
+        assertThat(resultString, containsString("<Issuer>https://arp.so.ch</Issuer><technicalContact>mailto:agi@bd.so.ch</technicalContact>"));               
     }
 
     private void writeFile(File destination, String content) throws IOException {
