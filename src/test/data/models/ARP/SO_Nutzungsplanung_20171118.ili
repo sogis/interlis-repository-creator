@@ -1,16 +1,6 @@
 INTERLIS 2.3;
 
 !!==============================================================================
-!!@ File = "SO_Nutzungsplanung_20171118.ili"; 
-!!@ Title = "Nutzungsplanung"; 
-!!@ shortDescription = "Nutzungsplanungsmodell des Kantons Solothurn. Umfasst 
-!!@ die im MGDM des Bundes definierten Informationen (GeoIV_ID: 73, 145, 157, 159) 
-!!@ sowie Erweiterungen des Kt. Solothurn"; 
-!!@ Issuer = "http://arp.so.ch"; 
-!!@ technicalContact = "http://agi.so.ch"; 
-!!@ furtherInformation = "Arbeitshilfe";
-!!  Erfassungsmodell;
-!!  Compiler-Version = "4.7.3-20170524"; 
 !!------------------------------------------------------------------------------
 !! Version    | wer | Änderung 
 !!------------------------------------------------------------------------------
@@ -30,8 +20,10 @@ INTERLIS 2.3;
 !!            |     | - Klasse Plandokument gelöscht
 !!==============================================================================
 
+!!@ technicalContact = "mailto:agi@bd.so.ch"; 
+!!@ furtherInformation = "http://geo.so.ch/models/ARP/SO_ARP_Nutzungsplanung_20171118.uml";
 MODEL SO_Nutzungsplanung_20171118 (de)
-AT "http://www.geo.so.ch"
+AT "https://arp.so.ch"
 VERSION "2017-11-18"  =
   IMPORTS GeometryCHLV95_V1,CHAdminCodes_V1;
 

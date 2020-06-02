@@ -90,11 +90,13 @@ public class InterlisRepositoryCreator extends DefaultTask {
         while (it.hasNext()) {
             File file = it.next();            
             TransferDescription td = getTransferDescriptionFromFileName(file.getAbsolutePath());            
-//            Model lastModel = td.getLastModel();
-            
+
+            // Mehrere Modelle in einer ili-Datei.
             for (Model lastModel : td.getModelsFromLastFile()) {
                 Iom_jObject iomObj = new Iom_jObject(ILI_CLASS, String.valueOf(i));
                 iomObj.setattrvalue("Name", lastModel.getName());
+                
+                
                 
                 if (lastModel.getIliVersion().equalsIgnoreCase("1")) {
                     iomObj.setattrvalue("SchemaLanguage", "ili1");
@@ -113,19 +115,21 @@ public class InterlisRepositoryCreator extends DefaultTask {
                 } else {
                     iomObj.setattrvalue("Version", lastModel.getModelVersion());
                 }
-
-                // TODO: We could use meta attributes for title and shortDescription.
-                // log.info(lastModel.getMetaValue("Title"));
-                // log.info(lastModel.getMetaValue("shortDescription"));
                 
                 try {
                     iomObj.setattrvalue("Issuer", lastModel.getIssuer());
                 } catch (IllegalArgumentException e) {
                     // do nothing
                 }
-                // iomObj.setattrvalue("technicalContact", "mailto:agi@bd.so.ch");
-                // iomObj.setattrvalue("furtherInformation", "https://geo.so.ch");
-
+                
+                if (lastModel.getMetaValue("technicalContact") != null) {
+                    iomObj.setattrvalue("technicalContact", lastModel.getMetaValue("technicalContact"));
+                }
+                
+                if (lastModel.getMetaValue("furtherInformation") != null) {
+                    iomObj.setattrvalue("furtherInformation", lastModel.getMetaValue("furtherInformation"));
+                }
+                
                 try (InputStream is = Files.newInputStream(Paths.get(file.getAbsolutePath()))) {
                     String md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(is);
                     iomObj.setattrvalue("md5", md5);
