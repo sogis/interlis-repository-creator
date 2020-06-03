@@ -22,3 +22,6 @@ Parameter | Beschreibung
 modelsDir | Verzeichnis mit den INTERLIS-Modelldateien.
 dataFile  | Name der `ilimodels.xml`-Datei. Wird im `modelsDir`-Verzeichnis gespeichert.
 
+# Bemerkungen
+
+- Die Metaattribute `technicalContact` und `furtherInformation` werden aus dem INTERLIS-Modell ausgelesen und als Attribute in der `ilimodels.xml`-Datei verwendet. Weil diese vom Typ `INTERLIS.URI` sein müssen, kommt es momentan zu Fehler beim Validieren den `ilimodels.xml`-Datei. Im Plugin-Code werden minimale Korrekturen vorgenommen oder aber das Metaattribut wird ignoriert. Die Metaattribute in den entsprechenden Modellen müssen z.B. bei der Umwandlung nach UTF-8 korrigiert werden.
