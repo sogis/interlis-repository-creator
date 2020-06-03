@@ -122,12 +122,20 @@ public class InterlisRepositoryCreator extends DefaultTask {
                     // do nothing
                 }
                 
-                if (lastModel.getMetaValue("technicalContact") != null) {
-                    iomObj.setattrvalue("technicalContact", lastModel.getMetaValue("technicalContact"));
+                String technicalContact = lastModel.getMetaValue("technicalContact");
+                if (technicalContact != null) {
+                    if (technicalContact.contains("@") && !technicalContact.startsWith("mailto")) {
+                        iomObj.setattrvalue("technicalContact", "mailto:agi@bd.so.ch");     
+                    } else {
+                        iomObj.setattrvalue("technicalContact", lastModel.getMetaValue("technicalContact"));     
+                    }
+                } else {
+                    iomObj.setattrvalue("technicalContact", "mailto:agi@bd.so.ch");
                 }
                 
-                if (lastModel.getMetaValue("furtherInformation") != null) {
-                    iomObj.setattrvalue("furtherInformation", lastModel.getMetaValue("furtherInformation"));
+                String furtherInformation = lastModel.getMetaValue("furtherInformation"); 
+                if (furtherInformation != null && furtherInformation.startsWith("http")) {
+                    iomObj.setattrvalue("furtherInformation", furtherInformation);
                 }
                 
                 try (InputStream is = Files.newInputStream(Paths.get(file.getAbsolutePath()))) {
