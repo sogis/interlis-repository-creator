@@ -95,9 +95,7 @@ public class InterlisRepositoryCreator extends DefaultTask {
             for (Model lastModel : td.getModelsFromLastFile()) {
                 Iom_jObject iomObj = new Iom_jObject(ILI_CLASS, String.valueOf(i));
                 iomObj.setattrvalue("Name", lastModel.getName());
-                
-                
-                
+
                 if (lastModel.getIliVersion().equalsIgnoreCase("1")) {
                     iomObj.setattrvalue("SchemaLanguage", "ili1");
                 } else if (lastModel.getIliVersion().equalsIgnoreCase("2.2")) {
@@ -180,7 +178,12 @@ public class InterlisRepositoryCreator extends DefaultTask {
     
     private TransferDescription getTransferDescriptionFromFileName(String fileName) throws Ili2cException {
         IliManager manager = new IliManager();
-        String repositories[] = new String[] { "http://models.interlis.ch/", "http://models.kkgeo.ch/", "http://models.geo.admin.ch/" };
+        // Lokales Verzeichnis muss als Repo verwendet werden, weil das Validierungsmodell das SO_FunctionsExt-Modell
+        // importiert.
+        // ./models/AGI/ -> Damit das Herstellen unserer Modellablage funktioniert. 
+        // ./src/test/data/models/AGI/ -> Damit das Testing lokal funktioniert.
+        // Muss entsprechend erweitert werden, falls andere Ämter auch gleiche Fälle haben.
+        String repositories[] = new String[] { "./models/AGI/", "./src/test/data/models/AGI/", "http://models.interlis.ch/", "http://models.kkgeo.ch/", "http://models.geo.admin.ch/" };
         manager.setRepositories(repositories);
         
         ArrayList<String> ilifiles = new ArrayList<String>();
