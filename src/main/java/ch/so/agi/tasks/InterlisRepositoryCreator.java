@@ -148,6 +148,10 @@ public class InterlisRepositoryCreator extends DefaultTask {
                     iomObj.addattrobj("dependsOnModel", iomObjDependsOnModel);
                 }
                 
+                if (file.getAbsolutePath().toLowerCase().contains("replaced")) {
+                    iomObj.setattrvalue("browseOnly", "true");
+                }
+                
                 ioxWriter.write(new ch.interlis.iox_j.ObjectEvent(iomObj));   
                 i++;                
             }
