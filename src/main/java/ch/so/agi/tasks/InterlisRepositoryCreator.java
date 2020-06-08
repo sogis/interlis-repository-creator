@@ -190,7 +190,16 @@ public class InterlisRepositoryCreator extends DefaultTask {
         // ./models/AGI/ -> Damit das Herstellen unserer Modellablage funktioniert. 
         // ./src/test/data/models/AGI/ -> Damit das Testing lokal funktioniert.
         // Muss entsprechend erweitert werden, falls andere Ämter auch gleiche Fälle haben.
-        String repositories[] = new String[] { "./models/AGI/", "./src/test/data/models/AGI/", "http://models.interlis.ch/", "http://models.kkgeo.ch/", "http://models.geo.admin.ch/" };
+        String repositories[] = new String[] { 
+                "./models/AGI/", 
+                "./models/ARP/", 
+                "./models/ARP/replaced/", 
+                "./src/test/data/models/AGI/", 
+                "./src/test/data/models/ARP/", 
+                "./src/test/data/models/ARP/replaced/", 
+                "http://models.interlis.ch/", 
+                "http://models.kkgeo.ch/", 
+                "http://models.geo.admin.ch/" };
         manager.setRepositories(repositories);
         
         ArrayList<String> ilifiles = new ArrayList<String>();
