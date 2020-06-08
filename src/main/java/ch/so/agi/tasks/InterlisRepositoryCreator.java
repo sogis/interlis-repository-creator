@@ -191,15 +191,17 @@ public class InterlisRepositoryCreator extends DefaultTask {
         // ./src/test/data/models/AGI/ -> Damit das Testing lokal funktioniert.
         // Muss entsprechend erweitert werden, falls andere Ämter auch gleiche Fälle haben.
         String repositories[] = new String[] { 
+                // TODO: Muss dynamisch werden!
+                "http://models.interlis.ch/", 
+                "http://models.kkgeo.ch/", 
+                "http://models.geo.admin.ch/", 
                 "./models/AGI/", 
                 "./models/ARP/", 
                 "./models/ARP/replaced/", 
                 "./src/test/data/models/AGI/", 
                 "./src/test/data/models/ARP/", 
-                "./src/test/data/models/ARP/replaced/", 
-                "http://models.interlis.ch/", 
-                "http://models.kkgeo.ch/", 
-                "http://models.geo.admin.ch/" };
+                "./src/test/data/models/ARP/replaced/"        
+            };
         manager.setRepositories(repositories);
         
         ArrayList<String> ilifiles = new ArrayList<String>();
