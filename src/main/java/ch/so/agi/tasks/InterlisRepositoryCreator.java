@@ -148,9 +148,12 @@ public class InterlisRepositoryCreator extends DefaultTask {
                     iomObj.addattrobj("dependsOnModel", iomObjDependsOnModel);
                 }
                 
-                if (file.getAbsolutePath().toLowerCase().contains("replaced")) {
-                    iomObj.setattrvalue("browseOnly", "true");
-                }
+                // TODO: Nicht sicher, ob man sich das selber ins Knie schiesst
+                // und plötzlich etwas nicht mehr sichtbar ist, was man aber
+                // finden sollte.
+//                if (file.getAbsolutePath().toLowerCase().contains("replaced")) {
+//                    iomObj.setattrvalue("browseOnly", "true");
+//                }
                 
                 ioxWriter.write(new ch.interlis.iox_j.ObjectEvent(iomObj));   
                 i++;                
