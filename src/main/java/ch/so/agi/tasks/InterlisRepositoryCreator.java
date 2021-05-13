@@ -89,6 +89,15 @@ public class InterlisRepositoryCreator extends DefaultTask {
         
         while (it.hasNext()) {
             File file = it.next();            
+            
+            // Abgelöste Modelle werden nicht im Fileindex (ilimodels.xml) 
+            // aufgelistet. Auch weil wir immer neue Modellnamen machen und
+            // keine precursorVersion-Semantik haben.
+            // Andere Variante wäre isBrowseOnly=true.
+            if(file.getAbsolutePath().toLowerCase().contains("replaced")) {
+                continue;
+            }
+            
             TransferDescription td = getTransferDescriptionFromFileName(file.getAbsolutePath());            
 
             // Mehrere Modelle in einer ili-Datei.
@@ -104,7 +113,6 @@ public class InterlisRepositoryCreator extends DefaultTask {
                     iomObj.setattrvalue("SchemaLanguage", "ili2_3");
                 }
                 
-                // TODO: Can this be done more sophisticated?
                 String filePath = file.getAbsoluteFile().getParent().replace(modelsDir.getAbsolutePath()+FileSystems.getDefault().getSeparator(), "");
                 iomObj.setattrvalue("File", filePath + "/" + file.getName());
 
@@ -147,13 +155,6 @@ public class InterlisRepositoryCreator extends DefaultTask {
                     iomObjDependsOnModel.setattrvalue("value",  model.getName());
                     iomObj.addattrobj("dependsOnModel", iomObjDependsOnModel);
                 }
-                
-                // TODO: Nicht sicher, ob man sich das selber ins Knie schiesst
-                // und plötzlich etwas nicht mehr sichtbar ist, was man aber
-                // finden sollte.
-//                if (file.getAbsolutePath().toLowerCase().contains("replaced")) {
-//                    iomObj.setattrvalue("browseOnly", "true");
-//                }
                 
                 ioxWriter.write(new ch.interlis.iox_j.ObjectEvent(iomObj));   
                 i++;                
