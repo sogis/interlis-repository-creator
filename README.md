@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/sogis/interlis-repository-creator.svg?branch=master)](https://travis-ci.org/sogis/interlis-repository-creator)
+![Build Status](https://github.com/sogis/interlis-repository-creator/actions/workflows/main.yml/badge.svg)
 
 # interlis-repository-creator
 Gradle plugin for creating INTERLIS repositories
@@ -21,8 +21,9 @@ Parameter | Beschreibung
 ----------|-------------------
 modelsDir | Verzeichnis mit den INTERLIS-Modelldateien.
 dataFile  | Name der `ilimodels.xml`-Datei. Wird im `modelsDir`-Verzeichnis gespeichert.
+technicalContact | URI für technischen Kontakt. Wird nur verwendet, falls das Modell kein gleichlautendes Metaattribut aufweist. Optional, standardmässig wird im Bedarfsfall `mailto:agi@bd.so.ch` verwendet.
 
 # Bemerkungen
 
-- Die Metaattribute `technicalContact` und `furtherInformation` werden aus dem INTERLIS-Modell ausgelesen und als Attribute in der `ilimodels.xml`-Datei verwendet. Weil diese vom Typ `INTERLIS.URI` sein müssen, kommt es momentan zu Fehler beim Validieren den `ilimodels.xml`-Datei. Im Plugin-Code werden minimale Korrekturen vorgenommen oder aber das Metaattribut wird ignoriert. Die Metaattribute in den entsprechenden Modellen müssen z.B. bei der Umwandlung nach UTF-8 korrigiert werden.
+- Die Metaattribute `technicalContact` und `furtherInformation` werden aus dem INTERLIS-Modell ausgelesen und als Attribute in der `ilimodels.xml`-Datei verwendet. Weil diese vom Typ `INTERLIS.URI` sein müssen, kommt es momentan zu Fehler beim Validieren der `ilimodels.xml`-Datei (wegen einiger unserer Modelle). Im Plugin-Code werden minimale Korrekturen vorgenommen oder es wird ein Standardwert gesetzt. Die Metaattribute in den entsprechenden Modellen müssen z.B. bei der Umwandlung nach UTF-8 korrigiert werden.
 - Beim Kompilieren der Modelle müssen lokalen Verzeichnisse berücksichtigt werden, weil lokale Modelle wiederum lokale Modelle importieren.

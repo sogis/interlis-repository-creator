@@ -8,17 +8,16 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//import org.gradle.internal.impldep.org.junit.platform.commons.logging.LoggerFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -37,7 +36,6 @@ import ch.interlis.iom_j.xtf.XtfWriter;
 import ch.interlis.ili2c.metamodel.Model;
 
 public class InterlisRepositoryCreator extends DefaultTask {
-//    private Logger log = LoggerFactory.getLogger(this.getClass());
     private Logger log = Logging.getLogger(this.getClass());
     
     private TransferDescription tdRepository = null;
@@ -47,11 +45,12 @@ public class InterlisRepositoryCreator extends DefaultTask {
     private final static String ILI_STRUCT_MODELNAME="IliRepository09.ModelName_";
     private final static String BID="b1";
 
-    @Input
-    public Object modelsDir = null;
+    private Object modelsDir = null;
 
-    @OutputFile
-    public Object dataFile = null;
+    private Object dataFile = null;
+    
+    @Optional
+    private String technicalContact = "mailto:agi@bd.so.ch";
 
     @TaskAction
     public void writeIliModelsFile() {        
@@ -71,6 +70,33 @@ public class InterlisRepositoryCreator extends DefaultTask {
             GradleException ge = new GradleException();
             throw ge;
         } 
+    }
+
+    @Input
+    public Object getModelsDir() {
+        return modelsDir;
+    } 
+    
+    public void setModelsDir(Object modelsDir) {
+        this.modelsDir = modelsDir;
+    }
+
+    @OutputFile
+    public Object getDataFile() {
+        return dataFile;
+    } 
+    
+    public void setDataFile(Object dataFile) {
+        this.dataFile = dataFile;
+    }
+    
+    @Input
+    public Object getTechnicalContact() {
+        return technicalContact;
+    } 
+    
+    public void setTechnicalContact(String technicalContact) {
+        this.technicalContact = technicalContact;
     }
 
     private void createXmlFile(String outputFileName, File modelsDir) throws Ili2cException, IoxException, IOException {
@@ -128,15 +154,15 @@ public class InterlisRepositoryCreator extends DefaultTask {
                     // do nothing
                 }
                 
-                String technicalContact = lastModel.getMetaValue("technicalContact");
-                if (technicalContact != null) {
-                    if (technicalContact.contains("@") && !technicalContact.startsWith("mailto")) {
-                        iomObj.setattrvalue("technicalContact", "mailto:agi@bd.so.ch");     
+                String modelTechnicalContact = lastModel.getMetaValue("technicalContact");
+                if (modelTechnicalContact != null) {
+                    if (isValidEmail(modelTechnicalContact) && !modelTechnicalContact.startsWith("mailto")) {
+                        iomObj.setattrvalue("technicalContact", "mailto:"+modelTechnicalContact);     
                     } else {
                         iomObj.setattrvalue("technicalContact", lastModel.getMetaValue("technicalContact"));     
                     }
                 } else {
-                    iomObj.setattrvalue("technicalContact", "mailto:agi@bd.so.ch");
+                    iomObj.setattrvalue("technicalContact", technicalContact);
                 }
                 
                 String furtherInformation = lastModel.getMetaValue("furtherInformation"); 
@@ -165,7 +191,6 @@ public class InterlisRepositoryCreator extends DefaultTask {
         ioxWriter.write(new ch.interlis.iox_j.EndTransferEvent());
         ioxWriter.flush();
         ioxWriter.close();
-
     }
     
     private TransferDescription getTransferDescriptionFromModelName(String iliModelName) throws Ili2cException {
@@ -215,5 +240,17 @@ public class InterlisRepositoryCreator extends DefaultTask {
         }
         
         return iliTd;
+    }
+    
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+        Pattern pat = Pattern.compile(emailRegex);
+        if (email == null) {
+            return false;
+        } 
+        return pat.matcher(email).matches();
     }
 }
