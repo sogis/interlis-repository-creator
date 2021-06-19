@@ -249,6 +249,11 @@ public class InterlisRepositoryCreator extends DefaultTask {
 //            };
         
         String repositories[] = this.modelRepo.split(";");
+        
+        System.out.println(fileName);
+        for (String repo : repositories) {
+            System.out.println(repo);
+        }
                
         manager.setRepositories(repositories);
         
