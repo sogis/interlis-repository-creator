@@ -58,8 +58,8 @@ public class InterlisRepositoryCreatorPluginTest {
         
         BuildResult result = GradleRunner.create()
             .withProjectDir(testProjectDir.getRoot())
-            .withArguments("createIliModelsXml")
-//            .withDebug(true)
+            .withArguments("createIliModelsXml", "-i")
+            //.withDebug(true)
             .forwardStdOutput(log)
             .withPluginClasspath()
             .build();

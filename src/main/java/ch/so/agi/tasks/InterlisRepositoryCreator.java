@@ -48,10 +48,13 @@ public class InterlisRepositoryCreator extends DefaultTask {
     private Object modelsDir = null;
 
     private Object dataFile = null;
-    
+   
     @Optional
     private String technicalContact = "mailto:agi@bd.so.ch";
 
+    @Optional
+    private String modelRepo = "http://models.interlis.ch/;http://models.kgk-cgc.ch/;http://models.geo.admin.ch/";
+    
     @TaskAction
     public void writeIliModelsFile() {        
         if (modelsDir == null) {
@@ -97,6 +100,15 @@ public class InterlisRepositoryCreator extends DefaultTask {
     
     public void setTechnicalContact(String technicalContact) {
         this.technicalContact = technicalContact;
+    }
+    
+    @Input
+    public String getModelRepo() {
+        return modelRepo;
+    }
+    
+    public void setModelRepo(String modelRepo) {
+        this.modelRepo = modelRepo;
     }
 
     private void createXmlFile(String outputFileName, File modelsDir) throws Ili2cException, IoxException, IOException {
@@ -193,9 +205,11 @@ public class InterlisRepositoryCreator extends DefaultTask {
         ioxWriter.close();
     }
     
+    // Methode wird nur zum Kompilieren von IliRepository09 benötigt.
+    // TODO: Abgrenzung / Synergien mit getTransferDescriptionFromFileName?
     private TransferDescription getTransferDescriptionFromModelName(String iliModelName) throws Ili2cException {
         IliManager manager = new IliManager();
-        String repositories[] = new String[] { "http://models.interlis.ch/", "http://models.kkgeo.ch/", "http://models.geo.admin.ch/", "http://geo.so.ch/models" };
+        String repositories[] = new String[] { "http://models.interlis.ch/", "http://models.kgk-cgc.ch/", "http://models.geo.admin.ch/", "http://geo.so.ch/models" };
         manager.setRepositories(repositories);
         ArrayList<String> modelNames = new ArrayList<String>();
         modelNames.add(iliModelName);
@@ -216,18 +230,26 @@ public class InterlisRepositoryCreator extends DefaultTask {
         // ./models/AGI/ -> Damit das Herstellen unserer Modellablage funktioniert. 
         // ./src/test/data/models/AGI/ -> Damit das Testing lokal funktioniert.
         // Muss entsprechend erweitert werden, falls andere Ämter auch gleiche Fälle haben.
-        String repositories[] = new String[] { 
-                // TODO: Muss dynamisch werden!
-                "http://models.interlis.ch/", 
-                "http://models.kkgeo.ch/", 
-                "http://models.geo.admin.ch/", 
-                "./models/AGI/", 
-                "./models/ARP/", 
-                "./models/ARP/replaced/", 
-                "./src/test/data/models/AGI/", 
-                "./src/test/data/models/ARP/", 
-                "./src/test/data/models/ARP/replaced/"        
-            };
+//        String repositories[] = new String[] { 
+//                // TODO: Muss dynamisch werden!
+//                
+//                // Als Parameter übergeben mit defaults? Wegen API-Break?
+//                
+//                "http://models.interlis.ch/", 
+//                "http://models.kgk-cgc.ch/", 
+//                "http://models.geo.admin.ch/", 
+//                "./models/AGI/", 
+//                "./models/ARP/", 
+//                "./models/ARP/replaced/", 
+//                
+//                // wenn es wegen des Testens dieses Codes ist, kann ich das ja auch übergeben.
+//                "./src/test/data/models/AGI/", 
+//                "./src/test/data/models/ARP/", 
+//                "./src/test/data/models/ARP/replaced/"        
+//            };
+        
+        String repositories[] = this.modelRepo.split(";");
+               
         manager.setRepositories(repositories);
         
         ArrayList<String> ilifiles = new ArrayList<String>();
