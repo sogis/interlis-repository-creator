@@ -7,8 +7,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
@@ -187,10 +189,17 @@ public class InterlisRepositoryCreator extends DefaultTask {
                     iomObj.setattrvalue("md5", md5);
                 }
 
-                // dependsOnModel
+                // imports                
                 for (Model model : lastModel.getImporting()) {
                     Iom_jObject iomObjDependsOnModel = new Iom_jObject(ILI_STRUCT_MODELNAME, null);
                     iomObjDependsOnModel.setattrvalue("value",  model.getName());
+                    iomObj.addattrobj("dependsOnModel", iomObjDependsOnModel);
+                }
+                
+                // translationOf
+                if (lastModel.getTranslationOf() != null) {
+                    Iom_jObject iomObjDependsOnModel = new Iom_jObject(ILI_STRUCT_MODELNAME, null);
+                    iomObjDependsOnModel.setattrvalue("value", lastModel.getTranslationOf().getName());
                     iomObj.addattrobj("dependsOnModel", iomObjDependsOnModel);
                 }
                 
@@ -224,37 +233,8 @@ public class InterlisRepositoryCreator extends DefaultTask {
     }
     
     private TransferDescription getTransferDescriptionFromFileName(String fileName) throws Ili2cException {
-        IliManager manager = new IliManager();
-        // Lokales Verzeichnis muss als Repo verwendet werden, weil das Validierungsmodell das SO_FunctionsExt-Modell
-        // importiert.
-        // ./models/AGI/ -> Damit das Herstellen unserer Modellablage funktioniert. 
-        // ./src/test/data/models/AGI/ -> Damit das Testing lokal funktioniert.
-        // Muss entsprechend erweitert werden, falls andere Ämter auch gleiche Fälle haben.
-//        String repositories[] = new String[] { 
-//                // TODO: Muss dynamisch werden!
-//                
-//                // Als Parameter übergeben mit defaults? Wegen API-Break?
-//                
-//                "http://models.interlis.ch/", 
-//                "http://models.kgk-cgc.ch/", 
-//                "http://models.geo.admin.ch/", 
-//                "./models/AGI/", 
-//                "./models/ARP/", 
-//                "./models/ARP/replaced/", 
-//                
-//                // wenn es wegen des Testens dieses Codes ist, kann ich das ja auch übergeben.
-//                "./src/test/data/models/AGI/", 
-//                "./src/test/data/models/ARP/", 
-//                "./src/test/data/models/ARP/replaced/"        
-//            };
-        
-        String repositories[] = this.modelRepo.split(";");
-        
-        System.out.println(fileName);
-        for (String repo : repositories) {
-            System.out.println(repo);
-        }
-               
+        IliManager manager = new IliManager();        
+        String repositories[] = modelRepo.split(";");
         manager.setRepositories(repositories);
         
         ArrayList<String> ilifiles = new ArrayList<String>();

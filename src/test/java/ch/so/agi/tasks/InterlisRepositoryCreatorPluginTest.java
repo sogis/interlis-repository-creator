@@ -72,6 +72,7 @@ public class InterlisRepositoryCreatorPluginTest {
         assertThat(resultString, containsString("<Name>DM01AVSO24LV95</Name>"));
         assertThat(resultString, containsString("<Name>SO_Nutzungsplanung_20171118</Name>"));       
         assertThat(resultString, containsString("<Name>SO_AWJF_Waldpflege_Erfassung_20191112</Name>"));               
+        assertThat(resultString, containsString("<Name>Base_f_LV95</Name>"));               
         assertThat(resultString, containsString("<Issuer>https://arp.so.ch</Issuer><technicalContact>mailto:agi@bd.so.ch</technicalContact>"));
         assertThat(resultString, containsString("<Issuer>https://agi.so.ch</Issuer><technicalContact>mailto:foo@bar.ch</technicalContact>"));
     }
