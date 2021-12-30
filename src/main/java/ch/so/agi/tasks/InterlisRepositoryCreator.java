@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -56,6 +58,9 @@ public class InterlisRepositoryCreator extends DefaultTask {
 
     @Optional
     private String modelRepo = "http://models.interlis.ch/;http://models.kgk-cgc.ch/;http://models.geo.admin.ch/";
+    
+    @Optional 
+    private Boolean ilismeta = false;
     
     @TaskAction
     public void writeIliModelsFile() {        
@@ -112,6 +117,16 @@ public class InterlisRepositoryCreator extends DefaultTask {
     public void setModelRepo(String modelRepo) {
         this.modelRepo = modelRepo;
     }
+    
+    @Input
+    public Boolean getIlismeta() {
+    	return ilismeta;
+    }
+    
+    public void setIlismeta(Boolean ilismeta) {
+    	this.ilismeta = ilismeta;
+    }
+    
 
     private void createXmlFile(String outputFileName, File modelsDir) throws Ili2cException, IoxException, IOException {
         tdRepository = getTransferDescriptionFromModelName("IliRepository09");
@@ -140,6 +155,19 @@ public class InterlisRepositoryCreator extends DefaultTask {
             
             TransferDescription td = getTransferDescriptionFromFileName(file.getAbsolutePath());            
 
+            // IMD output
+            // https://github.com/claeis/ili2c/issues/65
+            if (ilismeta) {
+            	File ilismetaDir = Paths.get(modelsDir.getParent(), "ilismeta").toFile();            
+            	File ilismetaFile = Paths.get(ilismetaDir.getAbsolutePath(), FilenameUtils.removeExtension(file.getName()) + ".xml").toFile();
+            	System.out.println(ilismetaFile);
+            	try {
+    			    ch.interlis.ili2c.generator.ImdGenerator.generate(ilismetaFile, td, TransferDescription.getVersion());
+    		    } catch (java.lang.IllegalStateException e) {
+    		    	Files.delete(Paths.get(ilismetaFile.getAbsolutePath()));
+    		    }
+		    }
+		                
             // Mehrere Modelle in einer ili-Datei.
             for (Model lastModel : td.getModelsFromLastFile()) {
                 Iom_jObject iomObj = new Iom_jObject(ILI_CLASS, String.valueOf(i));
@@ -204,7 +232,7 @@ public class InterlisRepositoryCreator extends DefaultTask {
                 }
                 
                 ioxWriter.write(new ch.interlis.iox_j.ObjectEvent(iomObj));   
-                i++;                
+                i++;  
             }
         }
         

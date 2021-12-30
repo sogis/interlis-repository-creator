@@ -1,5 +1,6 @@
 version.txt
 src/main/resources/templates/version.txt
+src/test/data/ilismeta/*.xml
 
 target/
 !.mvn/wrapper/maven-wrapper.jar

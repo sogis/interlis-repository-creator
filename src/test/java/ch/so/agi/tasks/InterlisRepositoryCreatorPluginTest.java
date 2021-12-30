@@ -50,6 +50,7 @@ public class InterlisRepositoryCreatorPluginTest {
                                   "     modelsDir = file('models') \n" +
                                   "     dataFile = 'ilimodels.xml' \n" +
                                   "     technicalContact = 'mailto:foo@bar.ch' \n" + 
+                                  "     ilismeta = true \n" + 
                                   "}";
         
         writeFile(buildFile, buildFileContent);
@@ -75,6 +76,10 @@ public class InterlisRepositoryCreatorPluginTest {
         assertThat(resultString, containsString("<Name>Base_f_LV95</Name>"));               
         assertThat(resultString, containsString("<Issuer>https://arp.so.ch</Issuer><technicalContact>mailto:agi@bd.so.ch</technicalContact>"));
         assertThat(resultString, containsString("<Issuer>https://agi.so.ch</Issuer><technicalContact>mailto:foo@bar.ch</technicalContact>"));
+                
+        String ilismetaString = new String(Files.readAllBytes(Paths.get(testProjectDir.getRoot().getAbsolutePath(), "ilismeta", "SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.xml")), StandardCharsets.UTF_8);
+        assertThat(ilismetaString, containsString("</IlisMeta07.ModelData>"));
+        assertThat(ilismetaString, containsString("<IlisMeta07.ModelData.Ili1TransferElement><Ili1TransferClass REF=\"SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.Nachfuehrungskreise.Gemeinde\"></Ili1TransferClass><Ili1RefAttr REF=\"SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.Nachfuehrungskreise.Gemeinde.UID\" ORDER_POS=\"16\"></Ili1RefAttr></IlisMeta07.ModelData.Ili1TransferElement>"));
     }
 
     private void writeFile(File destination, String content) throws IOException {
