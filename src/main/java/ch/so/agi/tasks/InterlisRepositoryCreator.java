@@ -160,7 +160,6 @@ public class InterlisRepositoryCreator extends DefaultTask {
             if (ilismeta) {
             	File ilismetaDir = Paths.get(modelsDir.getParent(), "ilismeta").toFile();            
             	File ilismetaFile = Paths.get(ilismetaDir.getAbsolutePath(), FilenameUtils.removeExtension(file.getName()) + ".xml").toFile();
-            	System.out.println(ilismetaFile);
             	try {
     			    ch.interlis.ili2c.generator.ImdGenerator.generate(ilismetaFile, td, TransferDescription.getVersion());
     		    } catch (java.lang.IllegalStateException e) {
