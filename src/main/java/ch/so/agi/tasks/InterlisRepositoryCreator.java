@@ -219,8 +219,12 @@ public class InterlisRepositoryCreator extends DefaultTask {
                 // imports                
                 for (Model model : lastModel.getImporting()) {
                     Iom_jObject iomObjDependsOnModel = new Iom_jObject(ILI_STRUCT_MODELNAME, null);
-                    iomObjDependsOnModel.setattrvalue("value",  model.getName());
-                    iomObj.addattrobj("dependsOnModel", iomObjDependsOnModel);
+                    
+                    // Das Modell INTERLIS wird nicht gefunden beim --check-repo-ilis Test.
+                    if (!model.getName().equalsIgnoreCase("INTERLIS")) {
+                        iomObjDependsOnModel.setattrvalue("value",  model.getName());
+                        iomObj.addattrobj("dependsOnModel", iomObjDependsOnModel);
+                    }
                 }
                 
                 // translationOf
