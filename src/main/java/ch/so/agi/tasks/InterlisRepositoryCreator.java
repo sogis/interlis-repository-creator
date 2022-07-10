@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -38,29 +39,34 @@ import ch.interlis.ilirepository.IliManager;
 import ch.interlis.iom_j.Iom_jObject;
 import ch.interlis.iom_j.xtf.XtfWriter;
 import ch.interlis.ili2c.metamodel.Model;
+import ch.ehi.basics.settings.Settings;
+import org.interlis2.validator.Validator;
 
 public class InterlisRepositoryCreator extends DefaultTask {
     private Logger log = Logging.getLogger(this.getClass());
     
     private TransferDescription tdRepository = null;
     private IoxWriter ioxWriter = null;
-    private final static String ILI_TOPIC="IliRepository09.RepositoryIndex";
-    private final static String ILI_CLASS=ILI_TOPIC+".ModelMetadata";
-    private final static String ILI_STRUCT_MODELNAME="IliRepository09.ModelName_";
     private final static String BID="b1";
 
+    private final List<String> repoModelNames = List.of("IliRepository09", "IliRepository20");
+    
     private Object modelsDir = null;
 
-    private Object dataFile = null;
+    @Optional
+    private Object dataFile = "ilimodels.xml";
    
     @Optional
     private String technicalContact = "mailto:agi@bd.so.ch";
 
     @Optional
-    private String modelRepo = "http://models.interlis.ch/;http://models.kgk-cgc.ch/;http://models.geo.admin.ch/";
+    private String modelRepos = "http://models.interlis.ch/;http://models.kgk-cgc.ch/;http://models.geo.admin.ch/";
     
     @Optional 
     private Boolean ilismeta = false;
+    
+    @Optional 
+    private String repoModelName = "IliRepository09";
     
     @TaskAction
     public void writeIliModelsFile() {        
@@ -70,12 +76,18 @@ public class InterlisRepositoryCreator extends DefaultTask {
         if (dataFile == null) {
             throw new IllegalArgumentException("dataFile must not be null");
         }
+        if (!repoModelNames.contains(repoModelName)) {
+            throw new IllegalArgumentException("modelRepoName is not a valid model name");
+        }
 
         try {
-            createXmlFile(this.getProject().file(dataFile).getAbsolutePath(), this.getProject().file(modelsDir));
+            boolean valid = createXmlFile(this.getProject().file(dataFile).getAbsolutePath(), this.getProject().file(modelsDir));
+            if (!valid) {
+                throw new GradleException("generated " + dataFile.toString() + " is not valid");
+            }
         } catch (Ili2cException | IoxException | IOException e) {
             e.printStackTrace();
-            log.error("failed to create ilimodels.xml");
+            log.error("failed to create " + dataFile.toString());
             log.error(e.getMessage());
             GradleException ge = new GradleException();
             throw ge;
@@ -110,12 +122,12 @@ public class InterlisRepositoryCreator extends DefaultTask {
     }
     
     @Input
-    public String getModelRepo() {
-        return modelRepo;
+    public String getModelRepos() {
+        return modelRepos;
     }
     
-    public void setModelRepo(String modelRepo) {
-        this.modelRepo = modelRepo;
+    public void setModelRepos(String modelRepos) {
+        this.modelRepos = modelRepos;
     }
     
     @Input
@@ -127,9 +139,21 @@ public class InterlisRepositoryCreator extends DefaultTask {
     	this.ilismeta = ilismeta;
     }
     
+    @Input
+    public String getRepoModelName() {
+        return repoModelName;
+    }
 
-    private void createXmlFile(String outputFileName, File modelsDir) throws Ili2cException, IoxException, IOException {
-        tdRepository = getTransferDescriptionFromModelName("IliRepository09");
+    public void setRepoModelName(String repoModelName) {
+        this.repoModelName = repoModelName;
+    }
+
+    private boolean createXmlFile(String outputFileName, File modelsDir) throws Ili2cException, IoxException, IOException {
+        String ILI_TOPIC=getRepoModelName()+".RepositoryIndex";
+        String ILI_CLASS=ILI_TOPIC+".ModelMetadata";
+        String ILI_STRUCT_MODELNAME=getRepoModelName()+".ModelName_";
+        
+        tdRepository = getTransferDescriptionFromModelName(getRepoModelName());
 
         File outputFile = new File(outputFileName);
         ioxWriter = new XtfWriter(outputFile, tdRepository);
@@ -156,15 +180,10 @@ public class InterlisRepositoryCreator extends DefaultTask {
             TransferDescription td = getTransferDescriptionFromFileName(file.getAbsolutePath());            
 
             // IMD output
-            // https://github.com/claeis/ili2c/issues/65
             if (ilismeta) {
             	File ilismetaDir = Paths.get(modelsDir.getParent(), "ilismeta").toFile();            
             	File ilismetaFile = Paths.get(ilismetaDir.getAbsolutePath(), FilenameUtils.removeExtension(file.getName()) + ".xml").toFile();
-            	try {
-    			    ch.interlis.ili2c.generator.ImdGenerator.generate(ilismetaFile, td, TransferDescription.getVersion());
-    		    } catch (java.lang.IllegalStateException e) {
-    		    	Files.delete(Paths.get(ilismetaFile.getAbsolutePath()));
-    		    }
+    			ch.interlis.ili2c.generator.ImdGenerator.generate(ilismetaFile, td, TransferDescription.getVersion());
 		    }
 		                
             // Mehrere Modelle in einer ili-Datei.
@@ -243,13 +262,20 @@ public class InterlisRepositoryCreator extends DefaultTask {
         ioxWriter.write(new ch.interlis.iox_j.EndTransferEvent());
         ioxWriter.flush();
         ioxWriter.close();
+        
+        Settings settings = new Settings();
+        settings.setValue(Validator.SETTING_ILIDIRS, Validator.SETTING_DEFAULT_ILIDIRS);
+        settings.setValue(Validator.SETTING_ALL_OBJECTS_ACCESSIBLE, Validator.TRUE);
+        boolean valid = Validator.runValidation(outputFile.getAbsolutePath(), settings);
+        
+        return valid;
     }
     
     // Methode wird nur zum Kompilieren von IliRepository09 benötigt.
     // TODO: Abgrenzung / Synergien mit getTransferDescriptionFromFileName?
     private TransferDescription getTransferDescriptionFromModelName(String iliModelName) throws Ili2cException {
         IliManager manager = new IliManager();
-        String repositories[] = new String[] { "http://models.interlis.ch/", "http://models.kgk-cgc.ch/", "http://models.geo.admin.ch/", "http://geo.so.ch/models" };
+        String repositories[] = new String[] { "http://models.interlis.ch/" };
         manager.setRepositories(repositories);
         ArrayList<String> modelNames = new ArrayList<String>();
         modelNames.add(iliModelName);
@@ -265,7 +291,7 @@ public class InterlisRepositoryCreator extends DefaultTask {
     
     private TransferDescription getTransferDescriptionFromFileName(String fileName) throws Ili2cException {
         IliManager manager = new IliManager();        
-        String repositories[] = modelRepo.split(";");
+        String repositories[] = modelRepos.split(";");
         manager.setRepositories(repositories);
         
         ArrayList<String> ilifiles = new ArrayList<String>();

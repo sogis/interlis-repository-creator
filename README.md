@@ -1,5 +1,11 @@
 ![Build Status](https://github.com/sogis/interlis-repository-creator/actions/workflows/main.yml/badge.svg)
 
+**TODO**:
+- Doc: ilismeta
+- Doc: Plugin-Upload (Verweis auf Version 1.0 (?) des Upload-Plugins. Dort läufts anders.)
+
+
+
 # interlis-repository-creator
 Gradle plugin for creating INTERLIS repositories
 
@@ -19,10 +25,13 @@ task createIliModels(type: InterlisRepositoryCreator) {
 
 Parameter | Beschreibung
 ----------|-------------------
-modelsDir | Verzeichnis mit den INTERLIS-Modelldateien.
-dataFile  | Name der `ilimodels.xml`-Datei. Wird im `modelsDir`-Verzeichnis gespeichert.
-modelRepo  | Modell-Respositories. Optional, default `http://models.interlis.ch/;http://models.kgk-cgc.ch/;http://models.geo.admin.ch`
-technicalContact | URI für technischen Kontakt. Wird nur verwendet, falls das Modell kein gleichlautendes Metaattribut aufweist. Optional, standardmässig wird im Bedarfsfall `mailto:agi@bd.so.ch` verwendet.
+modelsDir | File. Lokales Verzeichnis mit den INTERLIS-Modelldateien.
+dataFile  | String. Name der `ilimodels.xml`-Datei. Wird im `modelsDir`-Verzeichnis gespeichert. Optional, default `ilimodels.xml`.
+repoModelName | String. Name des Repository-Modells. Zur Auswahl stehen `IliRepository09` und `IliRepository20`. Optional, default `IliRepository09`.
+modelRepos  | String. Modell-Respositories, die beim Kompilieren der INTERLIS-Modelldateien verwendet werden. Optional, default `http://models.interlis.ch/;http://models.kgk-cgc.ch/;http://models.geo.admin.ch`
+technicalContact | String. URI für technischen Kontakt. Wird nur verwendet, falls das Modell kein gleichlautendes Metaattribut aufweist. Optional, default wird im Bedarfsfall `mailto:agi@bd.so.ch` verwendet.
+ilimeta | Boolean. Bei `true` wird für jedes INTERLIS-Modell das dazugehörig IlisMeta07-Datei (XTF) erzeugt.
+
 
 # Bemerkungen
 

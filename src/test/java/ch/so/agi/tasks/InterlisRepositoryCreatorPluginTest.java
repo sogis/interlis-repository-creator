@@ -40,18 +40,22 @@ public class InterlisRepositoryCreatorPluginTest {
     }
 
     @Test
-    public void testInterlisRepositoryCreator() throws IOException {
-        String buildFileContent = "plugins {\n" + 
-                                  "     id 'ch.so.agi.interlis-repository-creator'\n" + 
-                                  "}\n\n" +  
-                                  "import ch.so.agi.tasks.InterlisRepositoryCreator;\n" +
-                                  "" +
-                                  "task createIliModelsXml(type: InterlisRepositoryCreator) {" +
-                                  "     modelsDir = file('models') \n" +
-                                  "     dataFile = 'ilimodels.xml' \n" +
-                                  "     technicalContact = 'mailto:foo@bar.ch' \n" + 
-                                  "     ilismeta = true \n" + 
-                                  "}";
+    public void testInterlisRepositoryCreator_V09() throws IOException {
+        String buildFileContent = 
+"""
+plugins {  
+    id 'ch.so.agi.interlis-repository-creator' 
+} 
+
+import ch.so.agi.tasks.InterlisRepositoryCreator
+
+task createIliModelsXml(type: InterlisRepositoryCreator) {
+    modelsDir = file('models')
+    dataFile = 'ilimodels.xml'
+    technicalContact = 'mailto:foo@bar.ch'
+    ilismeta = true
+}
+""";
         
         writeFile(buildFile, buildFileContent);
 
@@ -69,6 +73,7 @@ public class InterlisRepositoryCreatorPluginTest {
         
         String resultString = new String(Files.readAllBytes(Paths.get(testProjectDir.getRoot().getAbsolutePath()+FileSystems.getDefault().getSeparator()+"ilimodels.xml")), StandardCharsets.UTF_8);
 
+        assertThat(resultString, containsString("<IliRepository09.RepositoryIndex BID=\"b1\">"));
         assertThat(resultString, not(containsString("<Name>SO_MOpublic_20180221</Name>")));
         assertThat(resultString, containsString("<Name>DM01AVSO24LV95</Name>"));
         assertThat(resultString, containsString("<Name>SO_Nutzungsplanung_20171118</Name>"));       
@@ -82,6 +87,44 @@ public class InterlisRepositoryCreatorPluginTest {
         assertThat(ilismetaString, containsString("<IlisMeta07.ModelData.Ili1TransferElement><Ili1TransferClass REF=\"SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.Nachfuehrungskreise.Gemeinde\"></Ili1TransferClass><Ili1RefAttr REF=\"SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.Nachfuehrungskreise.Gemeinde.UID\" ORDER_POS=\"16\"></Ili1RefAttr></IlisMeta07.ModelData.Ili1TransferElement>"));
     }
 
+    @Test
+    public void testInterlisRepositoryCreator_V20() throws IOException {
+        String buildFileContent = 
+"""
+plugins {  
+    id 'ch.so.agi.interlis-repository-creator' 
+} 
+
+import ch.so.agi.tasks.InterlisRepositoryCreator
+
+task createIliModelsXml(type: InterlisRepositoryCreator) {
+    modelsDir = file('models')
+    dataFile = 'ilimodels.xml'
+    repoModelName = 'IliRepository20'
+}
+""";
+        
+        writeFile(buildFile, buildFileContent);
+
+        BufferedWriter log = new BufferedWriter(new OutputStreamWriter(System.out));
+        
+        BuildResult result = GradleRunner.create()
+            .withProjectDir(testProjectDir.getRoot())
+            .withArguments("createIliModelsXml", "-i")
+            .withDebug(true)
+            .forwardStdOutput(log)
+            .withPluginClasspath()
+            .build();
+        
+        assertEquals(SUCCESS, result.task(":createIliModelsXml").getOutcome());
+        
+        String resultString = new String(Files.readAllBytes(Paths.get(testProjectDir.getRoot().getAbsolutePath()+FileSystems.getDefault().getSeparator()+"ilimodels.xml")), StandardCharsets.UTF_8);
+        
+        assertThat(resultString, containsString("<IliRepository20.RepositoryIndex BID=\"b1\">"));
+        assertThat(resultString, not(containsString("<Name>SO_MOpublic_20180221</Name>")));
+        assertThat(resultString, containsString("<Name>DM01AVSO24LV95</Name>"));
+    }
+        
     private void writeFile(File destination, String content) throws IOException {
         BufferedWriter output = null;
         try {
