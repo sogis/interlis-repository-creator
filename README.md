@@ -1,14 +1,7 @@
 ![Build Status](https://github.com/sogis/interlis-repository-creator/actions/workflows/main.yml/badge.svg)
 
-**TODO**:
-- Doc: ilismeta
-- Doc: Plugin-Upload (Verweis auf Version 1.0 (?) des Upload-Plugins. Dort läufts anders.)
-
-
-
 # interlis-repository-creator
 Gradle plugin for creating INTERLIS repositories
-
 
 Der InterlisRepositoryCreator-Task erstellt aus einem Verzeichnis (inkl. Unterverzeichnisses) mit INTERLIS-Modelldateien eine `ilimodels.xml`-Datei, welche die Grundlage für eine INTERLIS-Modellablage dient.
 
@@ -37,4 +30,5 @@ ilimeta | Boolean. Bei `true` wird für jedes INTERLIS-Modell das dazugehörig I
 
 - `rm -rf .ilicache`: Es wird das Standardverzeichnis des ilicaches verwendet `user.home`. Aus diesem Grund kann es zu Konflikten kommen und das Verzeichnis muss vor dem Ausführen des Tasks gelöscht werden (händisch oder mit Gradle task).
 - Die Metaattribute `technicalContact` und `furtherInformation` werden aus dem INTERLIS-Modell ausgelesen und als Attribute in der `ilimodels.xml`-Datei verwendet. Weil diese vom Typ `INTERLIS.URI` sein müssen, kommt es momentan zu Fehler beim Validieren der `ilimodels.xml`-Datei (wegen einiger unserer Modelle). Im Plugin-Code werden minimale Korrekturen vorgenommen oder es wird ein Standardwert gesetzt. Die Metaattribute in den entsprechenden Modellen müssen zu einem späteren Zeitpunkt korrigiert werden (SOGIS only).
-- Beim Kompilieren der Modelle müssen allenfalls lokalen Verzeichnisse berücksichtigt werden, weil lokale Modelle wiederum lokale Modelle importieren. Dazu kann der Parameter `modelRepo` verwendet werden.
+- Beim Kompilieren der Modelle müssen allenfalls lokalen Verzeichnisse berücksichtigt werden, weil lokale Modelle wiederum lokale Modelle importieren. Dazu kann der Parameter `modelRepos` verwendet werden.
+- Gradle-Plugin-Upload: Es wird eine alte Version des Plugins verwendet. Mit Version 1.0 (o.ä) gibt es einen API-Break.

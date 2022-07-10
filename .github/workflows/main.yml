@@ -1,26 +1,37 @@
 name: main
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     env:
       BUILD_NUMBER: ${{ github.run_number }}
+
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/cache@v1
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v3
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
         with:
-          java-version: 1.8
+          distribution: 'liberica'
+          java-version: 17
+
       - name: Build with Gradle
         run: ./gradlew clean build
+
       - name: Publish plugin
         run: ./gradlew publishPlugins
         if: ${{ github.ref == 'refs/heads/master' }}
