@@ -157,7 +157,7 @@ public class InterlisRepositoryCreator extends DefaultTask {
 
         File outputFile = new File(outputFileName);
         ioxWriter = new XtfWriter(outputFile, tdRepository);
-        ioxWriter.write(new ch.interlis.iox_j.StartTransferEvent("SOGIS-20190203", "", null));
+        ioxWriter.write(new ch.interlis.iox_j.StartTransferEvent("SOGIS-INTERLIS-REPOSITORY-CREATOR", "", null));
         ioxWriter.write(new ch.interlis.iox_j.StartBasketEvent(ILI_TOPIC,BID));
 
         // Loop through all the local models found.
