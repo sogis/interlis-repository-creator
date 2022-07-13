@@ -230,6 +230,16 @@ public class InterlisRepositoryCreator extends DefaultTask {
                     iomObj.setattrvalue("furtherInformation", furtherInformation);
                 }
                 
+                String title = lastModel.getMetaValue("Title");                
+                if (title != null) {
+                    iomObj.setattrvalue("Title", title);
+                }
+                
+                String shortDescription = lastModel.getMetaValue("shortDescription");
+                if (shortDescription != null) {
+                    iomObj.setattrvalue("shortDescription", shortDescription);
+                }
+                
                 try (InputStream is = Files.newInputStream(Paths.get(file.getAbsolutePath()))) {
                     String md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(is);
                     iomObj.setattrvalue("md5", md5);
