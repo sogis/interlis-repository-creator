@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.gradle.api.DefaultTask;
@@ -60,7 +63,7 @@ public class InterlisRepositoryCreator extends DefaultTask {
     private String technicalContact = "mailto:agi@bd.so.ch";
 
     @Optional
-    private String modelRepos = "http://models.interlis.ch/;http://models.kgk-cgc.ch/;http://models.geo.admin.ch/";
+    private String modelRepos = "https://models.interlis.ch/;https://models.kgk-cgc.ch/;https://models.geo.admin.ch/";
     
     @Optional 
     private Boolean ilismeta = false;
@@ -160,14 +163,31 @@ public class InterlisRepositoryCreator extends DefaultTask {
         ioxWriter.write(new ch.interlis.iox_j.StartTransferEvent("SOGIS-INTERLIS-REPOSITORY-CREATOR", "", null));
         ioxWriter.write(new ch.interlis.iox_j.StartBasketEvent(ILI_TOPIC,BID));
 
-        // Loop through all the local models found.
-        String[] iliExt = new String[] {"ili"};
-        IOFileFilter iliFilter = new SuffixFileFilter(iliExt, IOCase.INSENSITIVE);
-        Iterator<File> it = FileUtils.iterateFiles(modelsDir, iliFilter, TrueFileFilter.INSTANCE);
+        List<Path> models = new ArrayList<Path>();
+        try (Stream<Path> walk = Files.walk(modelsDir.toPath())) {
+            models = walk
+                    .filter(p -> !Files.isDirectory(p))   
+                    .filter(f -> isEndWith(f.toString()))
+                    .collect(Collectors.toList());        
+        }
+
+        // In einem ersten Durchlauf werden die Verzeichnisse eruiert, damit diese
+        // als (lokales) Repository beim Kompilieren verwendet werden können.
+        // Welches Problem löst das? Importieren lokale Modelle wiederum lokale Modelle,
+        // werden diese entweder nicht gefunden (falls sie in keinem Online-Repo sind) oder
+        // sie werden aus einem bestehenden/vorhanden Repository verwendet. Dies sollte 
+        // m.E. nicht die Regel sein.
+        Set<String> parentModelDirSet = new TreeSet<>();
+        for (Path model : models) {
+            parentModelDirSet.add(model.toFile().getAbsoluteFile().getParent());
+        }
+        List<String> repositories = new ArrayList<>();
+        repositories.addAll(Arrays.asList(modelRepos.split(";")));
+        repositories.addAll(parentModelDirSet);
+
         int i = 1;
-        
-        while (it.hasNext()) {
-            File file = it.next();            
+        for (Path modelPath : models) {
+            File file = modelPath.toFile();
             
             // Abgelöste Modelle werden nicht im Fileindex (ilimodels.xml) 
             // aufgelistet. Auch weil wir immer neue Modellnamen machen und
@@ -326,5 +346,12 @@ public class InterlisRepositoryCreator extends DefaultTask {
             return false;
         } 
         return pat.matcher(email).matches();
+    }
+    
+    private static boolean isEndWith(String file) {
+        if (file.toLowerCase().endsWith("ili")) {
+            return true;
+        }
+        return false;
     }
 }
