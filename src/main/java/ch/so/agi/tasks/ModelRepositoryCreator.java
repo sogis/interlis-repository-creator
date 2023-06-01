@@ -45,7 +45,7 @@ import ch.interlis.ili2c.metamodel.Model;
 import ch.ehi.basics.settings.Settings;
 import org.interlis2.validator.Validator;
 
-public class InterlisRepositoryCreator extends DefaultTask {
+public class ModelRepositoryCreator extends DefaultTask {
     private Logger log = Logging.getLogger(this.getClass());
     
     private TransferDescription tdRepository = null;

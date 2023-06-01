@@ -25,7 +25,7 @@ import static org.gradle.testkit.runner.TaskOutcome.*;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 
-public class InterlisRepositoryCreatorPluginTest {
+public class ModelRepositoryCreatorPluginTest {
     @Rule public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private File buildFile;
 
@@ -40,16 +40,16 @@ public class InterlisRepositoryCreatorPluginTest {
     }
 
     @Test
-    public void testInterlisRepositoryCreator_V09() throws IOException {
+    public void testModelRepositoryCreator_V09() throws IOException {
         String buildFileContent = 
 """
 plugins {  
     id 'ch.so.agi.interlis-repository-creator' 
 } 
 
-import ch.so.agi.tasks.InterlisRepositoryCreator
+import ch.so.agi.tasks.ModelRepositoryCreator
 
-task createIliModelsXml(type: InterlisRepositoryCreator) {
+task createIliModelsXml(type: ModelRepositoryCreator) {
     modelsDir = file('models')
     dataFile = 'ilimodels.xml'
     technicalContact = 'mailto:foo@bar.ch'
@@ -89,16 +89,16 @@ task createIliModelsXml(type: InterlisRepositoryCreator) {
     }
 
     @Test
-    public void testInterlisRepositoryCreator_V20() throws IOException {
+    public void testModelRepositoryCreator_V20() throws IOException {
         String buildFileContent = 
 """
 plugins {  
     id 'ch.so.agi.interlis-repository-creator' 
 } 
 
-import ch.so.agi.tasks.InterlisRepositoryCreator
+import ch.so.agi.tasks.ModelRepositoryCreator
 
-task createIliModelsXml(type: InterlisRepositoryCreator) {
+task createIliModelsXml(type: ModelRepositoryCreator) {
     modelsDir = file('models')
     dataFile = 'ilimodels.xml'
     repoModelName = 'IliRepository20'
