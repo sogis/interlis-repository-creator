@@ -173,6 +173,10 @@ public class IlihubRepositoryCreator extends DefaultTask {
         
         System.out.println(outputFileName);
         
+        // TODO
+        // Kann man mit einem Constraint testen, ob der Ordnernamen mit einem Amtskürzel beginnt?
+        //https://github.com/claeis/iox-ili/blob/master/src/main/java/ch/interlis/iox_j/validator/functions/Text.java#L231
+        
         Settings settings = new Settings();
         settings.setValue(Validator.SETTING_ILIDIRS, Validator.SETTING_DEFAULT_ILIDIRS);
         settings.setValue(Validator.SETTING_ALL_OBJECTS_ACCESSIBLE, Validator.TRUE);
