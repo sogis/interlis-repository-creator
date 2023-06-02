@@ -1,0 +1,102 @@
+layerorder: []
+layertree:
+- Online Risk:
+    checked: true
+    child-nodes:
+    - Betrieb:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_betrieb_qml_001
+        tablename: onlinerisk_betrieb
+    - "Geb\xE4ude":
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_geba_ude_qml_001
+        tablename: onlinerisk_gebaeude
+    - Untersuchungseinheit:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_untersuchungseinheit_qml_001
+        tablename: onlinerisk_untersuchungseinheit
+    - Bereich:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_bereich_qml_001
+        tablename: onlinerisk_bereich
+    - Stoff:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_stoff_qml_001
+        tablename: onlinerisk_stoff
+    - Stoffe im Bereich:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_stoffe_im_bereich_qml_001
+        tablename: onlinerisk_stoff_in_bereich
+    expanded: true
+    group: true
+- QRcat:
+    checked: true
+    child-nodes:
+    - Szenario:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_szenario_qml_001
+        tablename: qrcat_szenario
+    - "Letalfl\xE4che":
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_letalfla_che_qml_001
+        tablename: qrcat_letalflaeche
+    - "Toxisch ung\xFCnstigster Sektor":
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_toxisch_ungu_nstigster_sektor_qml_001
+        tablename: qrcat_toxischunguenstigster_sektor
+    - "Detailszenario (Grundh\xE4ufigkeit)":
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_detailszenario_grundha_ufigkeit_qml_001
+        tablename: qrcat_detailszenario_grundhaeufigkeit
+    - ToxReferenzSzenario:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_toxreferenzszenario_qml_001
+        tablename: qrcat_toxreferenzszenario
+    - Korrekturfaktoren F-Werte:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_korrekturfaktoren_f_werte_qml_001
+        tablename: qrcat_fwert
+    expanded: true
+    group: true
+- domains:
+    checked: true
+    child-nodes:
+    - Szenario_Art:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_szenario_art_qml_001
+        tablename: qrcat_szenario_art
+    - Bevoelkerung_Typ:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_bevoelkerung_typ_qml_001
+        tablename: qrcat_bevoelkerung_typ
+    - WK_Grundhaeufigkeit_Art:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_wk_grundhaeufigkeit_art_qml_001
+        tablename: qrcat_wk_grundhaeufigkeit_art
+    - Letalitaetsradius_Art:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_letalitaetsradius_art_qml_001
+        tablename: qrcat_letalitaetsradius_art
+    - ToxReferenzSzenario_TypStoff:
+        checked: true
+        expanded: true
+        qmlstylefile: ilidata:layerstyle_qrcat_toxreferenzszenario_typstoff_qml_001
+        tablename: qrcat_toxreferenzszenario_typstoff
+    expanded: false
+    group: true

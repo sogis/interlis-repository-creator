@@ -1,0 +1,17 @@
+layerorder: []
+layertree:
+- Hauptstadt:
+    checked: true
+    expanded: true
+    qmlstylefile: ilidata:layerstyle_agi_validation_demo_hauptstadt_qml_001
+    tablename: hauptstadt
+- Stadt:
+    checked: true
+    expanded: true
+    qmlstylefile: ilidata:layerstyle_agi_validation_demo_stadt_qml_001
+    tablename: stadt
+- Provinz / Bundesland / Kanton:
+    checked: true
+    expanded: true
+    qmlstylefile: ilidata:layerstyle_agi_validation_demo_provinz_bundesland_kanton_qml_001
+    tablename: provinz

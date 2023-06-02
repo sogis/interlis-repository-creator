@@ -1,0 +1,165 @@
+<?xml version="1.0" ?>
+<TRANSFER xmlns="http://www.interlis.ch/INTERLIS2.3">
+   <HEADERSECTION SENDER="ModelBaker IliProjectTopping" VERSION="2.3">
+      <MODELS>
+         <MODEL NAME="DatasetIdx16" VERSION="2018-11-21" URI="mailto:ce@eisenhutinformatik.ch"/>
+      </MODELS>
+   </HEADERSECTION>
+   <DATASECTION>
+      <DatasetIdx16.DataIndex BID="bea4dfa5-c298-44c3-a4d0-390eafb16c6a">
+         <DatasetIdx16.DataIndex.DatasetMetadata TID="67239da9-2d38-4dd0-94e5-9320c5cf3cdd">
+            <id>layerstyle_agi_validation_demo_hauptstadt_qml_001</id>
+            <version>2022-12-02</version>
+            <publishingDate>2022-12-02</publishingDate>
+            <owner>mailto:agi@bd.so.ch</owner>
+            <title>
+               <DatasetIdx16.MultilingualText>
+                  <LocalisedText>
+                     <DatasetIdx16.LocalisedText>
+                        <Text>QGIS layerstyle file for AGI Validation Demo - ('agi_validation_demo_hauptstadt', '.qml')</Text>
+                     </DatasetIdx16.LocalisedText>
+                  </LocalisedText>
+               </DatasetIdx16.MultilingualText>
+            </title>
+            <categories>
+               <DatasetIdx16.Code_>
+                  <value>http://codes.interlis.ch/type/layerstyle</value>
+               </DatasetIdx16.Code_>
+            </categories>
+            <files>
+               <DatasetIdx16.DataFile>
+                  <fileFormat>text/plain</fileFormat>
+                  <file>
+                     <DatasetIdx16.File>
+                        <path>layerstyle\agi_validation_demo_hauptstadt.qml</path>
+                     </DatasetIdx16.File>
+                  </file>
+               </DatasetIdx16.DataFile>
+            </files>
+         </DatasetIdx16.DataIndex.DatasetMetadata>
+         <DatasetIdx16.DataIndex.DatasetMetadata TID="051855f8-c127-4386-9658-b447ba97ae17">
+            <id>layerstyle_agi_validation_demo_stadt_qml_001</id>
+            <version>2022-12-02</version>
+            <publishingDate>2022-12-02</publishingDate>
+            <owner>mailto:agi@bd.so.ch</owner>
+            <title>
+               <DatasetIdx16.MultilingualText>
+                  <LocalisedText>
+                     <DatasetIdx16.LocalisedText>
+                        <Text>QGIS layerstyle file for AGI Validation Demo - ('agi_validation_demo_stadt', '.qml')</Text>
+                     </DatasetIdx16.LocalisedText>
+                  </LocalisedText>
+               </DatasetIdx16.MultilingualText>
+            </title>
+            <categories>
+               <DatasetIdx16.Code_>
+                  <value>http://codes.interlis.ch/type/layerstyle</value>
+               </DatasetIdx16.Code_>
+            </categories>
+            <files>
+               <DatasetIdx16.DataFile>
+                  <fileFormat>text/plain</fileFormat>
+                  <file>
+                     <DatasetIdx16.File>
+                        <path>layerstyle\agi_validation_demo_stadt.qml</path>
+                     </DatasetIdx16.File>
+                  </file>
+               </DatasetIdx16.DataFile>
+            </files>
+         </DatasetIdx16.DataIndex.DatasetMetadata>
+         <DatasetIdx16.DataIndex.DatasetMetadata TID="ff4fccb9-9016-4eea-8a36-9b01759383ca">
+            <id>layerstyle_agi_validation_demo_provinz_bundesland_kanton_qml_001</id>
+            <version>2022-12-02</version>
+            <publishingDate>2022-12-02</publishingDate>
+            <owner>mailto:agi@bd.so.ch</owner>
+            <title>
+               <DatasetIdx16.MultilingualText>
+                  <LocalisedText>
+                     <DatasetIdx16.LocalisedText>
+                        <Text>QGIS layerstyle file for AGI Validation Demo - ('agi_validation_demo_provinz_bundesland_kanton', '.qml')</Text>
+                     </DatasetIdx16.LocalisedText>
+                  </LocalisedText>
+               </DatasetIdx16.MultilingualText>
+            </title>
+            <categories>
+               <DatasetIdx16.Code_>
+                  <value>http://codes.interlis.ch/type/layerstyle</value>
+               </DatasetIdx16.Code_>
+            </categories>
+            <files>
+               <DatasetIdx16.DataFile>
+                  <fileFormat>text/plain</fileFormat>
+                  <file>
+                     <DatasetIdx16.File>
+                        <path>layerstyle\agi_validation_demo_provinz_bundesland_kanton.qml</path>
+                     </DatasetIdx16.File>
+                  </file>
+               </DatasetIdx16.DataFile>
+            </files>
+         </DatasetIdx16.DataIndex.DatasetMetadata>
+         <DatasetIdx16.DataIndex.DatasetMetadata TID="0f161505-f600-4c92-8589-15bbac3d80b0">
+            <id>projecttopping_agi_validation_demo_yaml_001</id>
+            <version>2022-12-02</version>
+            <publishingDate>2022-12-02</publishingDate>
+            <owner>mailto:agi@bd.so.ch</owner>
+            <title>
+               <DatasetIdx16.MultilingualText>
+                  <LocalisedText>
+                     <DatasetIdx16.LocalisedText>
+                        <Text>QGIS projecttopping file for AGI Validation Demo - ('agi_validation_demo', '.yaml')</Text>
+                     </DatasetIdx16.LocalisedText>
+                  </LocalisedText>
+               </DatasetIdx16.MultilingualText>
+            </title>
+            <categories>
+               <DatasetIdx16.Code_>
+                  <value>http://codes.interlis.ch/type/projecttopping</value>
+               </DatasetIdx16.Code_>
+            </categories>
+            <files>
+               <DatasetIdx16.DataFile>
+                  <fileFormat>text/plain</fileFormat>
+                  <file>
+                     <DatasetIdx16.File>
+                        <path>projecttopping\agi_validation_demo.yaml</path>
+                     </DatasetIdx16.File>
+                  </file>
+               </DatasetIdx16.DataFile>
+            </files>
+         </DatasetIdx16.DataIndex.DatasetMetadata>
+         <DatasetIdx16.DataIndex.DatasetMetadata TID="e18b5beb-8669-4044-baad-b02c55a36367">
+            <id>metaconfig_agi_validation_demo_ini_001</id>
+            <version>2022-12-02</version>
+            <publishingDate>2022-12-02</publishingDate>
+            <owner>mailto:agi@bd.so.ch</owner>
+            <title>
+               <DatasetIdx16.MultilingualText>
+                  <LocalisedText>
+                     <DatasetIdx16.LocalisedText>
+                        <Text>QGIS metaconfig file for AGI Validation Demo - ('agi_validation_demo', '.ini')</Text>
+                     </DatasetIdx16.LocalisedText>
+                  </LocalisedText>
+               </DatasetIdx16.MultilingualText>
+            </title>
+            <categories>
+               <DatasetIdx16.Code_>
+                  <value>http://codes.interlis.ch/type/metaconfig</value>
+               </DatasetIdx16.Code_>
+               <DatasetIdx16.Code_>
+                  <value>http://codes.interlis.ch/model/SO_AGI_DemoValidation_20221122</value>
+               </DatasetIdx16.Code_>
+            </categories>
+            <files>
+               <DatasetIdx16.DataFile>
+                  <fileFormat>text/plain</fileFormat>
+                  <file>
+                     <DatasetIdx16.File>
+                        <path>metaconfig\agi_validation_demo.ini</path>
+                     </DatasetIdx16.File>
+                  </file>
+               </DatasetIdx16.DataFile>
+            </files>
+         </DatasetIdx16.DataIndex.DatasetMetadata>
+      </DatasetIdx16.DataIndex>
+   </DATASECTION>
+</TRANSFER>

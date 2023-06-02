@@ -25,7 +25,7 @@ import static org.gradle.testkit.runner.TaskOutcome.*;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 
-public class ModelRepositoryCreatorPluginTest {
+public class ModelRepositoryCreatorTest {
     @Rule public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private File buildFile;
 
