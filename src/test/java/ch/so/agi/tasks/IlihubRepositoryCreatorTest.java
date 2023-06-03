@@ -66,62 +66,14 @@ task createIliDataXml(type: IlihubRepositoryCreator) {
             .withPluginClasspath()
             .build();
 
-//        assertEquals(SUCCESS, result.task(":createIliModelsXml").getOutcome());
-//        
-//        String resultString = new String(Files.readAllBytes(Paths.get(testProjectDir.getRoot().getAbsolutePath()+FileSystems.getDefault().getSeparator()+"ilimodels.xml")), StandardCharsets.UTF_8);
-//        
-//        assertThat(resultString, containsString("<IliRepository09.RepositoryIndex BID=\"b1\">"));
-//        assertThat(resultString, not(containsString("<Name>SO_MOpublic_20180221</Name>")));
-//        assertThat(resultString, containsString("<Name>DM01AVSO24LV95</Name>"));
-//        assertThat(resultString, containsString("<Name>SO_Nutzungsplanung_20171118</Name>"));       
-//        assertThat(resultString, containsString("<Name>SO_AWJF_Waldpflege_Erfassung_20191112</Name>"));               
-//        assertThat(resultString, containsString("<Name>Base_f_LV95</Name>"));               
-//        assertThat(resultString, containsString("<Issuer>https://arp.so.ch</Issuer><technicalContact>mailto:agi@bd.so.ch</technicalContact>"));
-//        assertThat(resultString, containsString("<Issuer>https://agi.so.ch</Issuer><technicalContact>mailto:foo@bar.ch</technicalContact>"));
-//        assertThat(resultString, containsString("<Title>Ich bin auch ein Titel</Title><shortDescription>Ich bin die Beschreibung</shortDescription>"));        
-//        
-//        String ilismetaString = new String(Files.readAllBytes(Paths.get(testProjectDir.getRoot().getAbsolutePath(), "ilismeta", "SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.xml")), StandardCharsets.UTF_8);
-//        assertThat(ilismetaString, containsString("</IlisMeta07.ModelData>"));
-//        assertThat(ilismetaString, containsString("<IlisMeta07.ModelData.Ili1TransferElement><Ili1TransferClass REF=\"SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.Nachfuehrungskreise.Gemeinde\"></Ili1TransferClass><Ili1RefAttr REF=\"SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.Nachfuehrungskreise.Gemeinde.UID\" ORDER_POS=\"16\"></Ili1RefAttr></IlisMeta07.ModelData.Ili1TransferElement>"));
+        assertEquals(SUCCESS, result.task(":createIliDataXml").getOutcome());
+        
+        String resultString = (Files.readString(Paths.get(testProjectDir.getRoot().getAbsolutePath()+FileSystems.getDefault().getSeparator()+"ilidata.xml"), StandardCharsets.UTF_8));
+        
+        assertThat(resultString, containsString("DatasetIdx16.DataIndex BID=\"b1\""));
+        assertThat(resultString, containsString("<DatasetIdx16.DataIndex.DatasetMetadata TID=\"ed8b4d21-aec3-4acc-8479-b6aea5b54f9c\">"));
+        assertThat(resultString, containsString("<path>afu_qrcat_usability-hub-configuration/layerstyle/qrcat_betrieb.qml</path>"));       
     }
-
-//    @Test
-//    public void testModelRepositoryCreator_V20() throws IOException {
-//        String buildFileContent = 
-//"""
-//plugins {  
-//    id 'ch.so.agi.interlis-repository-creator' 
-//} 
-//
-//import ch.so.agi.tasks.ModelRepositoryCreator
-//
-//task createIliModelsXml(type: ModelRepositoryCreator) {
-//    modelsDir = file('models')
-//    dataFile = 'ilimodels.xml'
-//    repoModelName = 'IliRepository20'
-//}
-//""";
-//        
-//        writeFile(buildFile, buildFileContent);
-//
-//        BufferedWriter log = new BufferedWriter(new OutputStreamWriter(System.out));
-//        
-//        BuildResult result = GradleRunner.create()
-//            .withProjectDir(testProjectDir.getRoot())
-//            .withArguments("createIliModelsXml", "-i")
-//            .withDebug(true)
-//            .forwardStdOutput(log)
-//            .withPluginClasspath()
-//            .build();
-//        
-//        assertEquals(SUCCESS, result.task(":createIliModelsXml").getOutcome());
-//        
-//        String resultString = new String(Files.readAllBytes(Paths.get(testProjectDir.getRoot().getAbsolutePath()+FileSystems.getDefault().getSeparator()+"ilimodels.xml")), StandardCharsets.UTF_8);
-//        
-//        assertThat(resultString, containsString("<IliRepository20.RepositoryIndex BID=\"b1\">"));
-//        assertThat(resultString, not(containsString("<Name>SO_MOpublic_20180221</Name>")));
-//        assertThat(resultString, containsString("<Name>DM01AVSO24LV95</Name>"));
-//    }
         
     private void writeFile(File destination, String content) throws IOException {
         BufferedWriter output = null;

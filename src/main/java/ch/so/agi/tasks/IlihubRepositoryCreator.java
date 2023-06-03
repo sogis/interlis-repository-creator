@@ -2,9 +2,11 @@ package ch.so.agi.tasks;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,8 +98,6 @@ public class IlihubRepositoryCreator extends DefaultTask {
 
     private boolean createXmlFile(String outputFileName, File reposDir) throws Ili2cException, IoxException, IOException {
         String ILI_TOPIC=REPO_MODEL_NAME+".DataIndex";
-        String ILI_CLASS=ILI_TOPIC+".DatasetMetadata";
-        //String ILI_STRUCT_MODELNAME=getRepoModelName()+".ModelName_";
 
         tdRepository = getTransferDescriptionFromModelName(REPO_MODEL_NAME);
 
@@ -117,68 +117,48 @@ public class IlihubRepositoryCreator extends DefaultTask {
                             return false;
                         }
                     })
-//                    .map(Path::toString)
-
-//                    .filter(f -> isEndWith(f.toString()))
                     .collect(Collectors.toList());        
         }
-        //repos.forEach(System.out::println);
 
-        for (Path repo : repos) {
-            System.out.println("*************** neues repo ******************");
-            
+        for (Path repo : repos) {            
             File iliDataSrcFile = Paths.get(repo.toFile().getAbsolutePath(), "ilidata.xml").toFile();
-            
             xtfReader = new XtfReader(iliDataSrcFile);
             IoxEvent event = xtfReader.read();
             while (event instanceof IoxEvent) {
                 if (event instanceof ObjectEvent) {
                     ObjectEvent objectEvent = (ObjectEvent) event;
                     IomObject iomObj = objectEvent.getIomObject();
-//                    System.out.println("iomObj: " + iomObj);
-                    
                     for (int i=0;i<iomObj.getattrvaluecount("files");i++) {
                         IomObject dataFileObj = iomObj.getattrobj("files", i);
-                        System.out.println("dataFileObj: " + dataFileObj);
-                        
                         for (int j=0;j<dataFileObj.getattrvaluecount("file");j++) {
-                            IomObject fileObj = dataFileObj.getattrobj("file", j);
-                            System.out.println("fileObj: " + fileObj.getattrvalue("path"));
-                            
+                            IomObject fileObj = dataFileObj.getattrobj("file", j);                            
                             String origPath = FilenameUtils.separatorsToSystem(fileObj.getattrvalue("path"));
-                            //System.out.println(repo.getFileName().toString());
                             String newPath = Paths.get(repo.getFileName().toString(), origPath).toString();
-                            System.out.println(newPath);
-
+                            fileObj.setattrvalue("path", newPath);
                         }
-                        
                     }
-                    
-                    
-//                    if (iomObj.getobjectoid().equalsIgnoreCase(id)) {
-//                        return iomObj;
-//                    }
+                    ioxWriter.write(new ch.interlis.iox_j.ObjectEvent(iomObj));
                 }
                 event = xtfReader.read();
             }
-
         }
-        
-        
-        
+
         ioxWriter.write(new ch.interlis.iox_j.EndBasketEvent());
         ioxWriter.write(new ch.interlis.iox_j.EndTransferEvent());
         ioxWriter.flush();
         ioxWriter.close();
-        
-        System.out.println(outputFileName);
-        
+                
         // TODO
         // Kann man mit einem Constraint testen, ob der Ordnernamen mit einem Amtskürzel beginnt?
         //https://github.com/claeis/iox-ili/blob/master/src/main/java/ch/interlis/iox_j/validator/functions/Text.java#L231
-        
+        String iliFileName = "DatasetIdx16.ili";
+        InputStream is = IlihubRepositoryCreator.class.getClassLoader().getResourceAsStream(iliFileName);
+        Path iliDir = Files.createTempDirectory("ilihubcreator");
+        Path iliFile = iliDir.resolve(new File(iliFileName).getName());
+        Files.copy(is, iliFile, StandardCopyOption.REPLACE_EXISTING);
+
         Settings settings = new Settings();
-        settings.setValue(Validator.SETTING_ILIDIRS, Validator.SETTING_DEFAULT_ILIDIRS);
+        settings.setValue(Validator.SETTING_ILIDIRS, iliDir.toFile().getAbsolutePath()+";"+Validator.SETTING_DEFAULT_ILIDIRS);
         settings.setValue(Validator.SETTING_ALL_OBJECTS_ACCESSIBLE, Validator.TRUE);
         boolean valid = Validator.runValidation(outputFile.getAbsolutePath(), settings);
 
