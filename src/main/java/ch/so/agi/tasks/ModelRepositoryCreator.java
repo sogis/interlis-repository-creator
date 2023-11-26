@@ -69,7 +69,7 @@ public class ModelRepositoryCreator extends DefaultTask {
     private Boolean ilismeta = false;
     
     @Optional 
-    private String repoModelName = "IliRepository09";
+    private String repoModelName = "IliRepository20";
     
     @TaskAction
     public void writeIliModelsFile() {        
@@ -179,11 +179,14 @@ public class ModelRepositoryCreator extends DefaultTask {
         // m.E. nicht die Regel sein.
         Set<String> parentModelDirSet = new TreeSet<>();
         for (Path model : models) {
+            if (model.toAbsolutePath().toString().contains("replaced")) {
+                continue;
+            } 
             parentModelDirSet.add(model.toFile().getAbsoluteFile().getParent());
         }
         List<String> repositories = new ArrayList<>();
-        repositories.addAll(Arrays.asList(modelRepos.split(";")));
         repositories.addAll(parentModelDirSet);
+        repositories.addAll(Arrays.asList(modelRepos.split(";")));
 
         int i = 1;
         for (Path modelPath : models) {
@@ -197,13 +200,13 @@ public class ModelRepositoryCreator extends DefaultTask {
                 continue;
             }
             
-            TransferDescription td = getTransferDescriptionFromFileName(file.getAbsolutePath());            
+            TransferDescription td = getTransferDescriptionFromFileName(file.getAbsolutePath(), repositories.toArray(new String[0]));            
 
             // IMD output
             if (ilismeta) {
             	File ilismetaDir = Paths.get(modelsDir.getParent(), "ilismeta").toFile();            
             	File ilismetaFile = Paths.get(ilismetaDir.getAbsolutePath(), FilenameUtils.removeExtension(file.getName()) + ".xml").toFile();
-    			ch.interlis.ili2c.generator.ImdGenerator.generate(ilismetaFile, td, TransferDescription.getVersion());
+    			ch.interlis.ili2c.generator.Imd16Generator.generate(ilismetaFile, td, TransferDescription.getVersion());
 		    }
 		                
             // Mehrere Modelle in einer ili-Datei.
@@ -301,7 +304,7 @@ public class ModelRepositoryCreator extends DefaultTask {
         return valid;
     }
     
-    // Methode wird nur zum Kompilieren von IliRepository09 benötigt.
+    // Methode wird nur zum Kompilieren von IliRepositoryXX benötigt.
     // TODO: Abgrenzung / Synergien mit getTransferDescriptionFromFileName?
     private TransferDescription getTransferDescriptionFromModelName(String iliModelName) throws Ili2cException {
         IliManager manager = new IliManager();
@@ -319,9 +322,8 @@ public class ModelRepositoryCreator extends DefaultTask {
         return iliTd;
     }
     
-    private TransferDescription getTransferDescriptionFromFileName(String fileName) throws Ili2cException {
+    private TransferDescription getTransferDescriptionFromFileName(String fileName, String[] repositories) throws Ili2cException {
         IliManager manager = new IliManager();        
-        String repositories[] = modelRepos.split(";");
         manager.setRepositories(repositories);
         
         ArrayList<String> ilifiles = new ArrayList<String>();

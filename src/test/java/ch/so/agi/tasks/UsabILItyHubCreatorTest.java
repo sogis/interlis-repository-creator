@@ -25,7 +25,7 @@ import static org.gradle.testkit.runner.TaskOutcome.*;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 
-public class IlihubRepositoryCreatorTest {
+public class UsabILItyHubCreatorTest {
     @Rule public final TemporaryFolder testProjectDir = new TemporaryFolder();
     private File buildFile;
 
@@ -33,7 +33,7 @@ public class IlihubRepositoryCreatorTest {
     public void setup() throws IOException {
         buildFile = testProjectDir.newFile("build.gradle");
         
-        File srcDir = new File("src/test/data/ilihub");
+        File srcDir = new File("src/test/data/usabilityhub");
         File trgDir = new File(testProjectDir.getRoot().getAbsolutePath());
 
         FileUtils.copyDirectoryToDirectory(srcDir, trgDir);
@@ -47,10 +47,10 @@ plugins {
     id 'ch.so.agi.interlis-repository-creator' 
 } 
 
-import ch.so.agi.tasks.IlihubRepositoryCreator
+import ch.so.agi.tasks.UsabILItyHubCreator
 
-task createIliDataXml(type: IlihubRepositoryCreator) {
-    reposDir = file('ilihub')
+task createIliDataXml(type: UsabILItyHubCreator) {
+    reposDir = file('usabilityhub')
     dataFile = 'ilidata.xml'
 }
 """;        

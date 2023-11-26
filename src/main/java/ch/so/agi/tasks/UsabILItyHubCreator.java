@@ -39,7 +39,7 @@ import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxWriter;
 import ch.interlis.iox_j.ObjectEvent;
 
-public class IlihubRepositoryCreator extends DefaultTask {
+public class UsabILItyHubCreator extends DefaultTask {
     private Logger log = Logging.getLogger(this.getClass());
     
     private TransferDescription tdRepository = null;
@@ -149,7 +149,7 @@ public class IlihubRepositoryCreator extends DefaultTask {
         ioxWriter.close();
                 
         String iliFileName = "DatasetIdx16.ili";
-        InputStream is = IlihubRepositoryCreator.class.getClassLoader().getResourceAsStream(iliFileName);
+        InputStream is = UsabILItyHubCreator.class.getClassLoader().getResourceAsStream(iliFileName);
         Path iliDir = Files.createTempDirectory("ilihubcreator");
         Path iliFile = iliDir.resolve(new File(iliFileName).getName());
         Files.copy(is, iliFile, StandardCopyOption.REPLACE_EXISTING);

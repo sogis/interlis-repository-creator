@@ -34,9 +34,9 @@ public class ModelRepositoryCreatorTest {
         buildFile = testProjectDir.newFile("build.gradle");
         
         File srcDir = new File("src/test/data/models");
-        File trgDir = new File(testProjectDir.getRoot().getAbsolutePath());
+        File dstDir = new File(testProjectDir.getRoot().getAbsolutePath());
 
-        FileUtils.copyDirectoryToDirectory(srcDir, trgDir);
+        FileUtils.copyDirectoryToDirectory(srcDir, dstDir);
     }
 
     @Test
@@ -52,6 +52,7 @@ import ch.so.agi.tasks.ModelRepositoryCreator
 task createIliModelsXml(type: ModelRepositoryCreator) {
     modelsDir = file('models')
     dataFile = 'ilimodels.xml'
+    repoModelName = 'IliRepository09'
     technicalContact = 'mailto:foo@bar.ch'
     ilismeta = true
 }
@@ -80,12 +81,12 @@ task createIliModelsXml(type: ModelRepositoryCreator) {
         assertThat(resultString, containsString("<Name>SO_AWJF_Waldpflege_Erfassung_20191112</Name>"));               
         assertThat(resultString, containsString("<Name>Base_f_LV95</Name>"));               
         assertThat(resultString, containsString("<Issuer>https://arp.so.ch</Issuer><technicalContact>mailto:agi@bd.so.ch</technicalContact>"));
-        assertThat(resultString, containsString("<Issuer>https://agi.so.ch</Issuer><technicalContact>mailto:foo@bar.ch</technicalContact>"));
+        assertThat(resultString, containsString("<Issuer>mailto:stefan.ziegler@bd.so.ch</Issuer><technicalContact>mailto:foo@bar.ch</technicalContact>"));
         assertThat(resultString, containsString("<Title>Ich bin auch ein Titel</Title><shortDescription>Ich bin die Beschreibung</shortDescription>"));        
         
         String ilismetaString = new String(Files.readAllBytes(Paths.get(testProjectDir.getRoot().getAbsolutePath(), "ilismeta", "SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.xml")), StandardCharsets.UTF_8);
-        assertThat(ilismetaString, containsString("</IlisMeta07.ModelData>"));
-        assertThat(ilismetaString, containsString("<IlisMeta07.ModelData.Ili1TransferElement><Ili1TransferClass REF=\"SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.Nachfuehrungskreise.Gemeinde\"></Ili1TransferClass><Ili1RefAttr REF=\"SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.Nachfuehrungskreise.Gemeinde.UID\" ORDER_POS=\"16\"></Ili1RefAttr></IlisMeta07.ModelData.Ili1TransferElement>"));
+        assertThat(ilismetaString, containsString("/IlisMeta16:ModelData"));
+        assertThat(ilismetaString, containsString("<IlisMeta16:AttrOrParam ili:tid=\"SO_AGI_AV_GB_Administrative_Einteilungen_Publikation_20180822.Nachfuehrungskreise.Gemeinde.UID\">"));
     }
 
     @Test
@@ -101,7 +102,6 @@ import ch.so.agi.tasks.ModelRepositoryCreator
 task createIliModelsXml(type: ModelRepositoryCreator) {
     modelsDir = file('models')
     dataFile = 'ilimodels.xml'
-    repoModelName = 'IliRepository20'
 }
 """;
         
