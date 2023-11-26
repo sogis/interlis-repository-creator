@@ -185,6 +185,7 @@ public class ModelRepositoryCreator extends DefaultTask {
             parentModelDirSet.add(model.toFile().getAbsoluteFile().getParent());
         }
         List<String> repositories = new ArrayList<>();
+        repositories.add("models-ext");
         repositories.addAll(parentModelDirSet);
         repositories.addAll(Arrays.asList(modelRepos.split(";")));
 
