@@ -122,6 +122,13 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
                             return false;
                         }
                     })
+                    .filter(f -> {
+                        if (f.toFile().getAbsolutePath().toLowerCase().contains("replaced")) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }) 
                     .collect(Collectors.toList());        
         }
 
