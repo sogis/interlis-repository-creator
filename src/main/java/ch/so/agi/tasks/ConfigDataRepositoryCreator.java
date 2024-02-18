@@ -2,9 +2,11 @@ package ch.so.agi.tasks;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -103,6 +105,7 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
         String ILI_CLASS=ILI_TOPIC+".DatasetMetadata";
         String ILI_STRUCT_CODE=REPO_MODEL_NAME+".Code_";
         String ILI_STRUCT_FILE=REPO_MODEL_NAME+".File";
+        String ILI_STRUCT_DATA_FILE=REPO_MODEL_NAME+".DataFile";
 
         tdRepository = getTransferDescriptionFromModelName(REPO_MODEL_NAME);
 
@@ -148,9 +151,22 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
                 iomObjCategory.setattrvalue("value", CONFIG_CODE_ILIVALIDATORCONFIG);                
             }
             iomObj.addattrobj("categories", iomObjCategory);
+            
 
+            Iom_jObject iomObjDataFile = new Iom_jObject(ILI_STRUCT_DATA_FILE, null);
+            iomObjDataFile.setattrvalue("fileFormat", "text/plain");
+
+            Iom_jObject iomObjFile = new Iom_jObject(ILI_STRUCT_FILE, null);
             String filePath = configFile.toFile().getAbsoluteFile().getParent().replace(configDir.getAbsolutePath()+FileSystems.getDefault().getSeparator(), "");
-            iomObj.setattrvalue("File", filePath + "/" + configFile.toFile().getName());
+            iomObjFile.setattrvalue("path", filePath + "/" + configFile.toFile().getName());
+            
+            try (InputStream is = Files.newInputStream(configFile)) {
+                String md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(is);
+                iomObjFile.setattrvalue("md5", md5);
+            }
+            
+            iomObjDataFile.addattrobj("file", iomObjFile);
+            iomObj.addattrobj("files", iomObjDataFile);
             
             ioxWriter.write(new ch.interlis.iox_j.ObjectEvent(iomObj));   
         }

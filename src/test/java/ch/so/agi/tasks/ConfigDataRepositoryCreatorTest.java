@@ -78,6 +78,7 @@ task createConfigDataXml(type: ConfigDataRepositoryCreator) {
         assertThat(resultString, containsString("<value>http://codes.interlis.ch/type/metaconfig</value>"));       
         assertThat(resultString, containsString("<id>ipw_2020-meta</id>"));               
         assertThat(resultString, containsString("mailto:foo@bar.ch"));               
+        assertThat(resultString, containsString("<DatasetIdx16.File><path>ALW/drainagen-meta.ini</path>"));               
     }
         
     private void writeFile(File destination, String content) throws IOException {
