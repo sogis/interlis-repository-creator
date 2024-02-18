@@ -22,9 +22,26 @@ Parameter | Beschreibung
 modelsDir | File. Lokales Verzeichnis mit den INTERLIS-Modelldateien.
 dataFile  | String. Name der _ilimodels.xml_-Datei. Wird im _modelsDir_-Verzeichnis gespeichert. Optional, default `ilimodels.xml`.
 repoModelName | String. Name des Repository-Modells. Zur Auswahl stehen `IliRepository09` und `IliRepository20`. Optional, default `IliRepository20`.
-modelRepos  | String. Modell-Respositories, die beim Kompilieren der INTERLIS-Modelldateien verwendet werden. Alle Ordner und Unterordner im `modelsDir`-Verzeichnis werden immer berücksichtigt. Optional, default `http://models.interlis.ch/;http://models.kgk-cgc.ch/;http://models.geo.admin.ch`
+modelRepos  | String. Modell-Respositories, die beim Kompilieren der INTERLIS-Modelldateien verwendet werden. Alle Ordner und Unterordner im `modelsDir`-Verzeichnis werden immer berücksichtigt. Weil diese Ordner vor den Standard-Repos verwendet werden, dauert es nun länger, weil immer z.B. Units gesucht wird. Um dies zu beschleunigen, kann man in einen _models-ext_-Ordner solche Basis-/Kern-Modelle kopieren. Optional, default `http://models.interlis.ch/;http://models.kgk-cgc.ch/;http://models.geo.admin.ch`
 technicalContact | String. URI für technischen Kontakt. Wird nur verwendet, falls das Modell kein gleichlautendes Metaattribut aufweist. Optional, default wird im Bedarfsfall `mailto:agi@bd.so.ch` verwendet.
 ilismeta | Boolean. Bei `true` wird für jedes INTERLIS-Modell die dazugehörige IlisMeta07-Datei (XTF) erzeugt.
+
+## ConfigDataRepositoryCreator
+Der ConfigDataRepositoryCreator-Task erstellt aus einem Verzeichnis (inkl. zwei Subverzeichnissen-Hierarchien) mit ini-Dateien eine ilidata.xml-Datei. Er prüft dabei _nicht_, ob die ini-Datei tatsächlich eine Config- oder Metaconfig-Datei für ilivalidator ist. Ebenso wenig wird die `http://codes.interlis.ch/model`-Kategorie geschrieben (Modell, für das die Config gültig ist). Die Information fehlt dazu in den ini-Datein (Eventuell eine Sidecar-Datei oder separater Info-Block in den ini-Dateien machen).
+
+```
+task createConfigDataXml(type: ConfigDataRepositoryCreator) {
+    configDir = file('config')
+    dataFile = 'ilidata.xml'
+    owner = 'mailto:foo@bar.ch'
+}
+```
+
+Parameter | Beschreibung
+----------|-------------------
+configDir | File. Lokales Verzeichnis mit den ini-Datein (in den Unterverzeichnissen).
+dataFile  | String. Name der _ilidata.xml_-Datei. Default `ilidata.xml`.
+owner | String. URI des Eigentümers. Default `mailto:agi@bd.so.ch`
 
 ## UsabILItyHubCreator
 Der UsabILItyHubCreator-Task erstellt aus einem Verzeichnis mit lokalen ilihub-Repositories (_ilidata.xml_-Datei und Subverzeichnissen mit QML, ini, yaml, etc.) eine gemeinsame _ilidata.xml_-Datei. Es werden die Verzeichnisse innerhalb des angegebenen Verzeichnisses durchsucht. Diese _müssen_ eine _ilidata.xml_-Datei aufweisen. Weitere Subverzeichnisse werden nicht berücksichtigt. Die erstellte _ilidata.xml_-Datei wird mit _ilivalidator_ geprüft. Es wurde ein zusätzlicher Constraint eingeführt: Die Verzeichnisse müssen mit einem Amtskürzel beginnen. Die veränderte Modelldatei ist Bestandteil dieses Code-Repos und muss ggf. nachgeführt werden.
