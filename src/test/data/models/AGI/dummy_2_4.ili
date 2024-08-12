@@ -1,0 +1,16 @@
+INTERLIS 2.4;
+
+MODEL Dummy_2_4 (de) 
+AT "https://www.kgk-cgc.ch/" 
+VERSION "2024-08-10" =
+      
+  TOPIC TopicA =
+    OID AS INTERLIS.UUIDOID;
+
+    CLASS ClassB =
+      Name : MANDATORY TEXT*255;
+    END ClassB;
+
+  END TopicA;
+
+END Dummy_2_4.

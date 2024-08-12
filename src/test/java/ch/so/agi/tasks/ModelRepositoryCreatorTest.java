@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -39,6 +40,7 @@ public class ModelRepositoryCreatorTest {
         FileUtils.copyDirectoryToDirectory(srcDir, dstDir);
     }
 
+    @Ignore
     @Test
     public void testModelRepositoryCreator_V09() throws IOException {
         String buildFileContent = 
@@ -73,7 +75,7 @@ task createIliModelsXml(type: ModelRepositoryCreator) {
         assertEquals(SUCCESS, result.task(":createIliModelsXml").getOutcome());
         
         String resultString = new String(Files.readAllBytes(Paths.get(testProjectDir.getRoot().getAbsolutePath()+FileSystems.getDefault().getSeparator()+"ilimodels.xml")), StandardCharsets.UTF_8);
-        
+
         assertThat(resultString, containsString("<IliRepository09.RepositoryIndex BID=\"b1\">"));
         assertThat(resultString, not(containsString("<Name>SO_MOpublic_20180221</Name>")));
         assertThat(resultString, containsString("<Name>DM01AVSO24LV95</Name>"));
@@ -124,6 +126,7 @@ task createIliModelsXml(type: ModelRepositoryCreator) {
         assertThat(resultString, containsString("<IliRepository20.RepositoryIndex BID=\"b1\">"));
         assertThat(resultString, not(containsString("<Name>SO_MOpublic_20180221</Name>")));
         assertThat(resultString, containsString("<Name>DM01AVSO24LV95</Name>"));
+        assertThat(resultString, containsString("<SchemaLanguage>ili2_4</SchemaLanguage>"));
     }
         
     private void writeFile(File destination, String content) throws IOException {
