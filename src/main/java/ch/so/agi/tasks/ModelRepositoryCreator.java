@@ -311,7 +311,7 @@ public class ModelRepositoryCreator extends DefaultTask {
     // TODO: Abgrenzung / Synergien mit getTransferDescriptionFromFileName?
     private TransferDescription getTransferDescriptionFromModelName(String iliModelName) throws Ili2cException {
         IliManager manager = new IliManager();
-        String repositories[] = new String[] { "http://models.interlis.ch/" };
+        String repositories[] = new String[] { "https://models.interlis.ch/" };
         manager.setRepositories(repositories);
         ArrayList<String> modelNames = new ArrayList<String>();
         modelNames.add(iliModelName);
