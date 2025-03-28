@@ -157,7 +157,9 @@ public class ModelRepositoryCreator extends DefaultTask {
         String ILI_CLASS=ILI_TOPIC+".ModelMetadata";
         String ILI_STRUCT_MODELNAME=getRepoModelName()+".ModelName_";
         
-        tdRepository = getTransferDescriptionFromModelName(getRepoModelName());
+        Path iliDirs = getIliDirs(getRepoModelName());
+        
+        tdRepository = getTransferDescriptionFromModelName(iliDirs.toString(), getRepoModelName());
 
         File outputFile = new File(outputFileName);
         ioxWriter = new XtfWriter(outputFile, tdRepository);
@@ -301,34 +303,36 @@ public class ModelRepositoryCreator extends DefaultTask {
         ioxWriter.close();
         
         Settings settings = new Settings();
-        settings.setValue(Validator.SETTING_ILIDIRS, Validator.SETTING_DEFAULT_ILIDIRS);
+        settings.setValue(Validator.SETTING_ILIDIRS, iliDirs.toString());
         settings.setValue(Validator.SETTING_ALL_OBJECTS_ACCESSIBLE, Validator.TRUE);
         boolean valid = Validator.runValidation(outputFile.getAbsolutePath(), settings);
         
         return valid;
     }
     
-    // Methode wird nur zum Kompilieren von IliRepositoryXX benötigt.
-    // TODO: Abgrenzung / Synergien mit getTransferDescriptionFromFileName?
-    private TransferDescription getTransferDescriptionFromModelName(String iliModelName) throws Ili2cException {
+    private Path getIliDirs(String modelName) throws IOException {
         Path targetPath = null;
-        try (InputStream inputStream = ModelRepositoryCreator.class.getClassLoader().getResourceAsStream("IliRepository20.ili")) {
+        try (InputStream inputStream = ModelRepositoryCreator.class.getClassLoader().getResourceAsStream(modelName+".ili")) {
             if (inputStream == null) {
                 throw new IOException("Resource not found");
             }
 
             Path tempDirectory = Files.createTempDirectory("ili_");
-            targetPath = tempDirectory.resolve("IliRepository20.ili");
+            targetPath = tempDirectory.resolve(modelName+".ili");
             Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-            System.out.println("File copied to: " + targetPath);
+            
+            return targetPath.getParent();
         } catch (IOException e) {
             e.printStackTrace();
-            throw new Ili2cException(e);
+            throw new IOException(e);
         }
-
+    }
+    
+    // Methode wird nur zum Kompilieren von IliRepositoryXX benötigt.
+    // TODO: Abgrenzung / Synergien mit getTransferDescriptionFromFileName?
+    private TransferDescription getTransferDescriptionFromModelName(String iliDirs, String iliModelName) throws Ili2cException {
         IliManager manager = new IliManager();
-        String repositories[] = new String[] { targetPath.getParent().toString() };
+        String repositories[] = new String[] { iliDirs };
         manager.setRepositories(repositories);
         ArrayList<String> modelNames = new ArrayList<String>();
         modelNames.add(iliModelName);
