@@ -7,6 +7,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -310,8 +311,24 @@ public class ModelRepositoryCreator extends DefaultTask {
     // Methode wird nur zum Kompilieren von IliRepositoryXX benötigt.
     // TODO: Abgrenzung / Synergien mit getTransferDescriptionFromFileName?
     private TransferDescription getTransferDescriptionFromModelName(String iliModelName) throws Ili2cException {
+        Path targetPath = null;
+        try (InputStream inputStream = ModelRepositoryCreator.class.getClassLoader().getResourceAsStream("IliRepository20.ili")) {
+            if (inputStream == null) {
+                throw new IOException("Resource not found");
+            }
+
+            Path tempDirectory = Files.createTempDirectory("ili_");
+            targetPath = tempDirectory.resolve("IliRepository20.ili");
+            Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+            System.out.println("File copied to: " + targetPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new Ili2cException(e);
+        }
+
         IliManager manager = new IliManager();
-        String repositories[] = new String[] { "https://models.interlis.ch/" };
+        String repositories[] = new String[] { targetPath.getParent().toString() };
         manager.setRepositories(repositories);
         ArrayList<String> modelNames = new ArrayList<String>();
         modelNames.add(iliModelName);
