@@ -7,6 +7,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,8 +107,10 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
         String ILI_STRUCT_CODE=REPO_MODEL_NAME+".Code_";
         String ILI_STRUCT_FILE=REPO_MODEL_NAME+".File";
         String ILI_STRUCT_DATA_FILE=REPO_MODEL_NAME+".DataFile";
+        
+        Path iliDirs = getIliDirs(REPO_MODEL_NAME);
 
-        tdRepository = getTransferDescriptionFromModelName(REPO_MODEL_NAME);
+        tdRepository = getTransferDescriptionFromModelName(iliDirs, REPO_MODEL_NAME);
 
         File outputFile = new File(outputFileName);
         ioxWriter = new XtfWriter(outputFile, tdRepository);
@@ -177,18 +180,36 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
         ioxWriter.write(new ch.interlis.iox_j.EndTransferEvent());
         ioxWriter.flush();
         ioxWriter.close();
-
+        
         Settings settings = new Settings();
-        settings.setValue(Validator.SETTING_ILIDIRS, Validator.SETTING_DEFAULT_ILIDIRS);
+        settings.setValue(Validator.SETTING_ILIDIRS, iliDirs.toString() + ";https://geo.so.ch/models"); // FIXME wegen Text.ili
         settings.setValue(Validator.SETTING_ALL_OBJECTS_ACCESSIBLE, Validator.TRUE);
         boolean valid = Validator.runValidation(outputFile.getAbsolutePath(), settings);
 
         return valid;
     }
     
-    private TransferDescription getTransferDescriptionFromModelName(String iliModelName) throws Ili2cException {
+    private Path getIliDirs(String modelName) throws IOException {
+        Path targetPath = null;
+        try (InputStream inputStream = ModelRepositoryCreator.class.getClassLoader().getResourceAsStream(modelName+".ili")) {
+            if (inputStream == null) {
+                throw new IOException("Resource not found");
+            }
+
+            Path tempDirectory = Files.createTempDirectory("ili_");
+            targetPath = tempDirectory.resolve(modelName+".ili");
+            Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            
+            return targetPath.getParent();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new IOException(e);
+        }
+    }
+    
+    private TransferDescription getTransferDescriptionFromModelName(Path iliDirs, String iliModelName) throws Ili2cException, IOException {        
         IliManager manager = new IliManager();
-        String repositories[] = new String[] { "http://models.interlis.ch/" };
+        String repositories[] = new String[] { iliDirs.toString(), "https://geo.so.ch/models" };
         manager.setRepositories(repositories);
         ArrayList<String> modelNames = new ArrayList<String>();
         modelNames.add(iliModelName);

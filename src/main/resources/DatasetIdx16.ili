@@ -7,9 +7,6 @@ INTERLIS 2.3;
 MODEL DatasetIdx16 (de)
 AT "mailto:ce@eisenhutinformatik.ch"
 VERSION "2022-10-10" =
-
-IMPORTS Text;
-
   DOMAIN
 
     LanguageCode_ISO639_1 = TEXT*2;
@@ -39,20 +36,6 @@ IMPORTS Text;
   STRUCTURE File =
     path : MANDATORY RelativeFilePath;
     md5 : TEXT*32;
-    MANDATORY CONSTRAINT Text.startsWith(path, "ada") 
-      OR Text.startsWith(path, "afu")
-      OR Text.startsWith(path, "agem")
-      OR Text.startsWith(path, "agi")
-      OR Text.startsWith(path, "ags")
-      OR Text.startsWith(path, "alw")
-      OR Text.startsWith(path, "amb")
-      OR Text.startsWith(path, "arp")
-      OR Text.startsWith(path, "avt")
-      OR Text.startsWith(path, "awa")
-      OR Text.startsWith(path, "awjf")
-      OR Text.startsWith(path, "hba")
-      OR Text.startsWith(path, "ksta")
-      OR Text.startsWith(path, "sgv");
   END File;
 
   /** a link to dataset or a link to a basket.
