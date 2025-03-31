@@ -55,6 +55,10 @@ public class ModelRepositoryCreator extends DefaultTask {
 
     private final List<String> repoModelNames = List.of("IliRepository09", "IliRepository20");
     
+    // ignoredDirectories = "x;adf;a";
+    // modelsDirectory = file("asdf")
+    // modelDir = "asdf,asdf,asdf"
+    
     private Object modelsDir = null;
 
     @Optional
@@ -63,6 +67,10 @@ public class ModelRepositoryCreator extends DefaultTask {
     @Optional
     private String technicalContact = "mailto:agi@bd.so.ch";
 
+    // Braucht es das noch als Default? Ich möchte ja aus dem models-ext die Daten verwenden.
+    // -> Sauber erläutern in Doku. D.h. auch models-ext ist für das Kompilieren während
+    // der ilimodels.xml-Herstellung. Und es muss kompiliert werden, um an Infos zu kommen
+    // und wohl auch sonst sinnvoll, falls Modell fehler aufweist.
     @Optional
     private String modelRepos = "https://models.interlis.ch/;https://models.kgk-cgc.ch/;https://models.geo.admin.ch/";
     
@@ -179,7 +187,7 @@ public class ModelRepositoryCreator extends DefaultTask {
         // Welches Problem löst das? Importieren lokale Modelle wiederum lokale Modelle,
         // werden diese entweder nicht gefunden (falls sie in keinem Online-Repo sind) oder
         // sie werden aus einem bestehenden/vorhanden Repository verwendet. Dies sollte 
-        // m.E. nicht die Regel sein.
+        // m.E. nicht die Regel sein, weil sie ja geändert haben können.
         Set<String> parentModelDirSet = new TreeSet<>();
         for (Path model : models) {
             if (model.toAbsolutePath().toString().contains("replaced")) {
@@ -274,7 +282,7 @@ public class ModelRepositoryCreator extends DefaultTask {
                     iomObj.setattrvalue("md5", md5);
                 }
 
-                // imports                
+                // Importierte Modelle                
                 for (Model model : lastModel.getImporting()) {
                     Iom_jObject iomObjDependsOnModel = new Iom_jObject(ILI_STRUCT_MODELNAME, null);
                     
@@ -285,7 +293,7 @@ public class ModelRepositoryCreator extends DefaultTask {
                     }
                 }
                 
-                // translationOf
+                // translationOf Modelle
                 if (lastModel.getTranslationOf() != null) {
                     Iom_jObject iomObjDependsOnModel = new Iom_jObject(ILI_STRUCT_MODELNAME, null);
                     iomObjDependsOnModel.setattrvalue("value", lastModel.getTranslationOf().getName());
