@@ -71,6 +71,7 @@ public class ModelRepositoryCreator extends DefaultTask {
     // -> Sauber erläutern in Doku. D.h. auch models-ext ist für das Kompilieren während
     // der ilimodels.xml-Herstellung. Und es muss kompiliert werden, um an Infos zu kommen
     // und wohl auch sonst sinnvoll, falls Modell fehler aufweist.
+    // Und models-ext muss flach bleiben, es wird nicht rekursiv durchsucht beim Kompilieren.
     @Optional
     private String modelRepos = "https://models.interlis.ch/;https://models.kgk-cgc.ch/;https://models.geo.admin.ch/";
     
