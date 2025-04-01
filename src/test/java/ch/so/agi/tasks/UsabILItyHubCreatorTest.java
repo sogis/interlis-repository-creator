@@ -50,8 +50,8 @@ plugins {
 import ch.so.agi.tasks.UsabILItyHubCreator
 
 task createIliDataXml(type: UsabILItyHubCreator) {
-    reposDir = file('usabilityhub')
-    dataFile = 'ilidata.xml'
+    reposDirectory = file('usabilityhub')
+    dataFile = file('ilidata.xml')
 }
 """;        
         writeFile(buildFile, buildFileContent);

@@ -42,7 +42,7 @@ task createConfigDataXml(type: ConfigDataRepositoryCreator) {
 Parameter | Beschreibung
 ----------|-------------------
 configDirectory | `File`. Lokales Verzeichnis mit den ini-Datein (in den Unterverzeichnissen).
-dataFile  | `String`. Name der _ilidata.xml_-Datei. Default `ilidata.xml`.
+dataFile  | `File`. Name der _ilidata.xml_-Datei. Default `ilidata.xml`.
 owner | `String`. URI des Eigentümers. Default `mailto:agi@bd.so.ch`
 
 ## UsabILItyHubCreator
@@ -50,15 +50,15 @@ Der UsabILItyHubCreator-Task erstellt aus einem Verzeichnis mit lokalen ilihub-R
 
 ```
 task createIliDataXml(type: UsabILItyHubCreator) {
-    reposDir = file('ilihub')
-    dataFile = 'ilidata.xml'
+    reposDirectory = file('ilihub')
+    dataFile = file()'ilidata.xml')
 }
 ```
 
 Parameter | Beschreibung
 ----------|-------------------
-reposDir | File. Lokales Verzeichnis mit den lokalen ilihub-Repos.
-dataFile  | String. Name der _ilidata.xml_-Datei. Wird im _reposDir_-Verzeichnis gespeichert. Optional, default `ilimodels.xml`.
+reposDir | `File`. Lokales Verzeichnis mit den lokalen ilihub-Repos.
+dataFile  | `File`. Name der _ilidata.xml_-Datei. Wird im _reposDir_-Verzeichnis gespeichert. Optional, default `ilimodels.xml`.
 
 
 ## System Requirements

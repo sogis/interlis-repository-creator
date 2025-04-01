@@ -49,15 +49,33 @@ public class UsabILItyHubCreator extends DefaultTask {
     private static final String BID="b1";
     private static final String REPO_MODEL_NAME = "DatasetIdx16";
 
-    private File reposDir = null;
+    private File reposDirectory = null;    
+    private File dataFile = new File("ilidata.xml");
     
+    @InputDirectory
+    public Object getReposDirectory() {
+        return reposDirectory;
+    } 
+    
+    @OutputFile
     @Optional
-    private Object dataFile = "ilidata.xml";
+    public Object getDataFile() {
+        return dataFile;
+    } 
+
+    public void setReposDirectory(File reposDirectory) {
+        this.reposDirectory = reposDirectory;
+    }
+
+    public void setDataFile(File dataFile) {
+        this.dataFile = dataFile;
+    }
+
 
     @TaskAction
     public void writeIliDataFile() {        
-        if (reposDir == null) {
-            throw new IllegalArgumentException("reposDir must not be null");
+        if (reposDirectory == null) {
+            throw new IllegalArgumentException("reposDirectory must not be null");
         }
 
         if (dataFile == null) {
@@ -65,7 +83,7 @@ public class UsabILItyHubCreator extends DefaultTask {
         }
 
         try {
-            boolean valid = createXmlFile(this.getProject().file(dataFile).getAbsolutePath(), this.getProject().file(reposDir));
+            boolean valid = createXmlFile(this.getProject().file(dataFile).getAbsolutePath(), this.getProject().file(reposDirectory));
             if (!valid) {
                 throw new GradleException("generated " + dataFile.toString() + " is not valid");
             }
@@ -78,28 +96,14 @@ public class UsabILItyHubCreator extends DefaultTask {
         } 
     }
     
-    @InputDirectory
-    public Object getReposDir() {
-        return reposDir;
-    } 
-    
-    public void setReposDir(File reposDir) {
-        this.reposDir = reposDir;
-    }
-
-    @OutputFile
-    public Object getDataFile() {
-        return dataFile;
-    } 
-
-    public void setDataFile(Object dataFile) {
-        this.dataFile = dataFile;
-    }
-
     private boolean createXmlFile(String outputFileName, File reposDir) throws Ili2cException, IoxException, IOException {
         String ILI_TOPIC=REPO_MODEL_NAME+".DataIndex";
 
-        tdRepository = getTransferDescriptionFromModelName(REPO_MODEL_NAME);
+        Path tempDirectory = Files.createTempDirectory("ili_");
+        Path datasetIdxIli = loadResource("DatasetIdx16.ili", tempDirectory);
+        loadResource("Text.ili", tempDirectory);
+
+        tdRepository = getTransferDescription(datasetIdxIli, new String[] { datasetIdxIli.getParent().toString() });
 
         File outputFile = new File(outputFileName);
         ioxWriter = new XtfWriter(outputFile, tdRepository);
@@ -155,29 +159,33 @@ public class UsabILItyHubCreator extends DefaultTask {
         Files.copy(is, iliFile, StandardCopyOption.REPLACE_EXISTING);
 
         Settings settings = new Settings();
-        //settings.setValue(Validator.SETTING_ILIDIRS, iliDir.toFile().getAbsolutePath()+";"+Validator.SETTING_DEFAULT_ILIDIRS);
-        settings.setValue(Validator.SETTING_ILIDIRS, Validator.SETTING_DEFAULT_ILIDIRS);
+        settings.setValue(Validator.SETTING_ILIDIRS, datasetIdxIli.getParent().toString());
         settings.setValue(Validator.SETTING_ALL_OBJECTS_ACCESSIBLE, Validator.TRUE);
         boolean valid = Validator.runValidation(outputFile.getAbsolutePath(), settings);
 
         return valid;
     }
-    
-    private TransferDescription getTransferDescriptionFromModelName(String iliModelName) throws Ili2cException {
-        IliManager manager = new IliManager();
-        String repositories[] = new String[] { "http://models.interlis.ch/" };
-        manager.setRepositories(repositories);
-        ArrayList<String> modelNames = new ArrayList<String>();
-        modelNames.add(iliModelName);
-        Configuration config = manager.getConfig(modelNames, 2.3);
-        ch.interlis.ili2c.metamodel.TransferDescription iliTd = Ili2c.runCompiler(config);
 
-        if (iliTd == null) {
-            throw new IllegalArgumentException("INTERLIS compiler failed"); 
+    private TransferDescription getTransferDescription(Path fileName, String[] respositories) throws IOException, Ili2cException {
+        IliManager manager = new IliManager();        
+        manager.setRepositories(respositories);
+        
+        ArrayList<String> ilifiles = new ArrayList<String>();
+        ilifiles.add(fileName.toString());
+        Configuration config = manager.getConfigWithFiles(ilifiles);
+        TransferDescription td = Ili2c.runCompiler(config);
+                
+        if (td == null) {
+            throw new IllegalArgumentException("INTERLIS compiler failed");
         }
         
-        return iliTd;
+        return td;
     }
-
-
+    
+    private static Path loadResource(String fileName, Path outputFolder) throws IOException  {
+        Path outFile = Paths.get(outputFolder.toFile().getAbsolutePath(), fileName);
+        InputStream is = ModelRepositoryCreator.class.getResourceAsStream("/"+fileName);
+        Files.copy(is, outFile, StandardCopyOption.REPLACE_EXISTING);        
+        return outFile;
+    }
 }

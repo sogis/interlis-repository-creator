@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,9 +108,11 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
         String ILI_STRUCT_FILE=REPO_MODEL_NAME+".File";
         String ILI_STRUCT_DATA_FILE=REPO_MODEL_NAME+".DataFile";
         
-        Path iliDirs = getIliDirs(REPO_MODEL_NAME);
+        Path tempDirectory = Files.createTempDirectory("ili_");
+        Path datasetIdxIli = loadResource("DatasetIdx16.ili", tempDirectory);
+        loadResource("Text.ili", tempDirectory);
 
-        tdRepository = getTransferDescriptionFromModelName(iliDirs, REPO_MODEL_NAME);
+        tdRepository = getTransferDescription(datasetIdxIli, new String[] { datasetIdxIli.getParent().toString() });
 
         File outputFile = new File(outputFileName);
         ioxWriter = new XtfWriter(outputFile, tdRepository);
@@ -181,45 +184,33 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
         ioxWriter.close();
         
         Settings settings = new Settings();
-        settings.setValue(Validator.SETTING_ILIDIRS, iliDirs.toString() + ";https://geo.so.ch/models"); // FIXME wegen Text.ili
+        settings.setValue(Validator.SETTING_ILIDIRS, datasetIdxIli.getParent().toString());
         settings.setValue(Validator.SETTING_ALL_OBJECTS_ACCESSIBLE, Validator.TRUE);
         boolean valid = Validator.runValidation(outputFile.getAbsolutePath(), settings);
 
         return valid;
     }
     
-    private Path getIliDirs(String modelName) throws IOException {
-        Path targetPath = null;
-        try (InputStream inputStream = ModelRepositoryCreator.class.getClassLoader().getResourceAsStream(modelName+".ili")) {
-            if (inputStream == null) {
-                throw new IOException("Resource not found");
-            }
-
-            Path tempDirectory = Files.createTempDirectory("ili_");
-            targetPath = tempDirectory.resolve(modelName+".ili");
-            Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-            
-            return targetPath.getParent();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException(e);
-        }
-    }
-    
-    private TransferDescription getTransferDescriptionFromModelName(Path iliDirs, String iliModelName) throws Ili2cException, IOException {        
-        IliManager manager = new IliManager();
-        String repositories[] = new String[] { iliDirs.toString(), "https://geo.so.ch/models" };
-        manager.setRepositories(repositories);
-        ArrayList<String> modelNames = new ArrayList<String>();
-        modelNames.add(iliModelName);
-        Configuration config = manager.getConfig(modelNames, 2.3);
-        ch.interlis.ili2c.metamodel.TransferDescription iliTd = Ili2c.runCompiler(config);
-
-        if (iliTd == null) {
-            throw new IllegalArgumentException("INTERLIS compiler failed"); 
+    private TransferDescription getTransferDescription(Path fileName, String[] respositories) throws IOException, Ili2cException {
+        IliManager manager = new IliManager();        
+        manager.setRepositories(respositories);
+        
+        ArrayList<String> ilifiles = new ArrayList<String>();
+        ilifiles.add(fileName.toString());
+        Configuration config = manager.getConfigWithFiles(ilifiles);
+        TransferDescription td = Ili2c.runCompiler(config);
+                
+        if (td == null) {
+            throw new IllegalArgumentException("INTERLIS compiler failed");
         }
         
-        return iliTd;
+        return td;
     }
-
+    
+    private static Path loadResource(String fileName, Path outputFolder) throws IOException  {
+        Path outFile = Paths.get(outputFolder.toFile().getAbsolutePath(), fileName);
+        InputStream is = ModelRepositoryCreator.class.getResourceAsStream("/"+fileName);
+        Files.copy(is, outFile, StandardCopyOption.REPLACE_EXISTING);        
+        return outFile;
+    }
 }

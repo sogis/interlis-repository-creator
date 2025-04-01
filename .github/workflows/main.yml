@@ -24,9 +24,9 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
-      # - name: Publish plugin
-      #   run: ./gradlew publishPlugins
-      #   if: ${{ github.ref == 'refs/heads/master' }}
-      #   env:
-      #     gradlePublishKey: ${{ secrets.gradlePublishKey }}
-      #     gradlePublishSecret: ${{ secrets.gradlePublishSecret }}
+      - name: Publish plugin
+        run: ./gradlew publishPlugins
+        if: ${{ github.ref == 'refs/heads/master' }}
+        env:
+          gradlePublishKey: ${{ secrets.gradlePublishKey }}
+          gradlePublishSecret: ${{ secrets.gradlePublishSecret }}

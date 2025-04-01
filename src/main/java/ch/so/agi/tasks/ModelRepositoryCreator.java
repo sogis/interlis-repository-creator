@@ -327,10 +327,7 @@ public class ModelRepositoryCreator extends DefaultTask {
             Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
             
             return getTransferDescription(targetPath, new String[] { targetPath.getParent().toString() });
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IOException(e);
-        }        
+        }       
     }
     
     private TransferDescription getTransferDescription(Path fileName, String[] respositories) throws IOException, Ili2cException {
