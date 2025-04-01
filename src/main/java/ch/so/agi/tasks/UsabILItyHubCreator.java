@@ -53,13 +53,13 @@ public class UsabILItyHubCreator extends DefaultTask {
     private File dataFile = new File("ilidata.xml");
     
     @InputDirectory
-    public Object getReposDirectory() {
+    public File getReposDirectory() {
         return reposDirectory;
     } 
     
     @OutputFile
     @Optional
-    public Object getDataFile() {
+    public File getDataFile() {
         return dataFile;
     } 
 
