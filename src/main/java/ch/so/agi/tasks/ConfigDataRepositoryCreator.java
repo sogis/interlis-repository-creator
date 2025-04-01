@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +17,7 @@ import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -44,34 +44,33 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
     private static final String CONFIG_CODE_ILIVALIDATORCONFIG = "http://codes.interlis.ch/type/ilivalidatorconfig";
     private static final String CONFIG_CODE_METACONFIG = "http://codes.interlis.ch/type/metaconfig";
     
-    private Object configDir = null;
-
-    @Optional
-    private Object dataFile = "ilidata.xml";
-   
+    private File configDirectory = null;
+    private File dataFile = new File("ilidata.xml");
     private String owner = "mailto:agi@bd.so.ch";
     
-    @Input
-    public Object getConfigDir() {
-        return configDir;
-    }
-
-    public void setConfigDir(Object configDir) {
-        this.configDir = configDir;
+    @InputDirectory
+    public File getConfigDirectory() {
+        return configDirectory;
     }
 
     @OutputFile
-    public Object getDataFile() {
+    @Optional
+    public File getDataFile() {
         return dataFile;
     }
 
-    public void setDataFile(Object dataFile) {
-        this.dataFile = dataFile;
-    }
-
     @Input
+    @Optional
     public String getOwner() {
         return owner;
+    }
+
+    public void setConfigDirectory(File configDirectory) {
+        this.configDirectory = configDirectory;
+    }
+    
+    public void setDataFile(File dataFile) {
+        this.dataFile = dataFile;
     }
 
     public void setOwner(String owner) {
@@ -80,7 +79,7 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
 
     @TaskAction
     public void writeIliDataFile() {        
-        if (configDir == null) {
+        if (configDirectory == null) {
             throw new IllegalArgumentException("configDir must not be null");
         }
         if (dataFile == null) {
@@ -88,7 +87,7 @@ public class ConfigDataRepositoryCreator extends DefaultTask {
         }
 
         try {
-            boolean valid = createXmlFile(this.getProject().file(dataFile).getAbsolutePath(), this.getProject().file(configDir));
+            boolean valid = createXmlFile(this.getProject().file(dataFile).getAbsolutePath(), this.getProject().file(configDirectory));
             if (!valid) {
                 throw new GradleException("generated " + dataFile.toString() + " is not valid");
             }

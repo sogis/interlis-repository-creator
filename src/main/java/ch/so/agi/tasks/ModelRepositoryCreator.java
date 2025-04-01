@@ -23,6 +23,7 @@ import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -36,6 +37,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import ch.interlis.ili2c.Ili2c;
 import ch.interlis.ili2c.Ili2cException;
 import ch.interlis.ili2c.config.Configuration;
+import ch.interlis.ili2c.generator.Imd16Generator;
 import ch.interlis.ili2c.metamodel.TransferDescription;
 import ch.interlis.iox.IoxException;
 import ch.interlis.iox.IoxWriter;
@@ -52,49 +54,83 @@ public class ModelRepositoryCreator extends DefaultTask {
     private TransferDescription tdRepository = null;
     private IoxWriter ioxWriter = null;
     private final static String BID="b1";
-
-    private final List<String> repoModelNames = List.of("IliRepository09", "IliRepository20");
-    
-    // ignoredDirectories = "x;adf;a";
-    // modelsDirectory = file("asdf")
-    // modelDir = "asdf,asdf,asdf"
-    
-    private Object modelsDir = null;
-
-    @Optional
-    private Object dataFile = "ilimodels.xml";
-   
-    @Optional
+        
+    private File modelsDirectory = null;
+    private File dataFile = new File("ilimodels.xml");
     private String technicalContact = "mailto:agi@bd.so.ch";
-
-    // Braucht es das noch als Default? Ich möchte ja aus dem models-ext die Daten verwenden.
-    // -> Sauber erläutern in Doku. D.h. auch models-ext ist für das Kompilieren während
-    // der ilimodels.xml-Herstellung. Und es muss kompiliert werden, um an Infos zu kommen
-    // und wohl auch sonst sinnvoll, falls Modell fehler aufweist.
-    // Und models-ext muss flach bleiben, es wird nicht rekursiv durchsucht beim Kompilieren.
-    @Optional
-    private String modelRepos = "https://models.interlis.ch/;https://models.kgk-cgc.ch/;https://models.geo.admin.ch/";
-    
-    @Optional 
+    private String modelRepos = "";
     private Boolean ilismeta = false;
+    private String ignoredDirectories = "";
     
+    @InputDirectory
+    public File getModelsDirectory() {
+        return modelsDirectory;
+    } 
+    
+    @OutputFile
+    @Optional
+    public File getDataFile() {
+        return dataFile;
+    } 
+    
+    @Input
+    @Optional
+    public Object getTechnicalContact() {
+        return technicalContact;
+    } 
+    
+    @Input
+    @Optional    
+    public String getModelRepos() {
+        return modelRepos;
+    }
+    
+    @Input
     @Optional 
-    private String repoModelName = "IliRepository20";
+    public Boolean getIlismeta() {
+        return ilismeta;
+    }
+
+    @Input
+    @Optional
+    public String getIgnoredDirectories() {
+        return ignoredDirectories;
+    }
     
+    public void setModelsDirectory(File modelsDirectory) {
+        this.modelsDirectory = modelsDirectory;
+    }
+
+    public void setDataFile(File dataFile) {
+        this.dataFile = dataFile;
+    }
+
+    public void setTechnicalContact(String technicalContact) {
+        this.technicalContact = technicalContact;
+    }
+
+    public void setModelRepos(String modelRepos) {
+        this.modelRepos = modelRepos;
+    }
+
+    public void setIlismeta(Boolean ilismeta) {
+        this.ilismeta = ilismeta;
+    }
+
+    public void setIgnoredDirectories(String ignoredDirectories) {
+        this.ignoredDirectories = ignoredDirectories;
+    }
+
     @TaskAction
     public void writeIliModelsFile() {        
-        if (modelsDir == null) {
-            throw new IllegalArgumentException("modelsDir must not be null");
+        if (modelsDirectory == null) {
+            throw new IllegalArgumentException("modelsDirectory must not be null");
         }
         if (dataFile == null) {
             throw new IllegalArgumentException("dataFile must not be null");
         }
-        if (!repoModelNames.contains(repoModelName)) {
-            throw new IllegalArgumentException("modelRepoName is not a valid model name");
-        }
-
         try {
-            boolean valid = createXmlFile(this.getProject().file(dataFile).getAbsolutePath(), this.getProject().file(modelsDir));
+            boolean valid = createXmlFile(this.getProject().file(dataFile).getAbsolutePath(), this.getProject().file(modelsDirectory), ignoredDirectories);
             if (!valid) {
                 throw new GradleException("generated " + dataFile.toString() + " is not valid");
             }
@@ -107,74 +143,18 @@ public class ModelRepositoryCreator extends DefaultTask {
         } 
     }
 
-    @Input
-    public Object getModelsDir() {
-        return modelsDir;
-    } 
-    
-    public void setModelsDir(Object modelsDir) {
-        this.modelsDir = modelsDir;
-    }
-
-    @OutputFile
-    public Object getDataFile() {
-        return dataFile;
-    } 
-    
-    public void setDataFile(Object dataFile) {
-        this.dataFile = dataFile;
-    }
-    
-    @Input
-    public Object getTechnicalContact() {
-        return technicalContact;
-    } 
-    
-    public void setTechnicalContact(String technicalContact) {
-        this.technicalContact = technicalContact;
-    }
-    
-    @Input
-    public String getModelRepos() {
-        return modelRepos;
-    }
-    
-    public void setModelRepos(String modelRepos) {
-        this.modelRepos = modelRepos;
-    }
-    
-    @Input
-    public Boolean getIlismeta() {
-    	return ilismeta;
-    }
-    
-    public void setIlismeta(Boolean ilismeta) {
-    	this.ilismeta = ilismeta;
-    }
-    
-    @Input
-    public String getRepoModelName() {
-        return repoModelName;
-    }
-
-    public void setRepoModelName(String repoModelName) {
-        this.repoModelName = repoModelName;
-    }
-
-    private boolean createXmlFile(String outputFileName, File modelsDir) throws Ili2cException, IoxException, IOException {
-        String ILI_TOPIC=getRepoModelName()+".RepositoryIndex";
+    private boolean createXmlFile(String outputFileName, File modelsDir, String ignoredDirectories) throws Ili2cException, IoxException, IOException {
+        String ILI_TOPIC="IliRepository20.RepositoryIndex";
         String ILI_CLASS=ILI_TOPIC+".ModelMetadata";
-        String ILI_STRUCT_MODELNAME=getRepoModelName()+".ModelName_";
+        String ILI_STRUCT_MODELNAME="IliRepository20.ModelName_";
         
-        Path iliDirs = getIliDirs(getRepoModelName());
+        tdRepository = getTransferDescription("IliRepository20");
         
-        tdRepository = getTransferDescriptionFromModelName(iliDirs.toString(), getRepoModelName());
-
         File outputFile = new File(outputFileName);
         ioxWriter = new XtfWriter(outputFile, tdRepository);
         ioxWriter.write(new ch.interlis.iox_j.StartTransferEvent("SOGIS-INTERLIS-REPOSITORY-CREATOR", "", null));
         ioxWriter.write(new ch.interlis.iox_j.StartBasketEvent(ILI_TOPIC,BID));
-
+    
         List<Path> models = new ArrayList<Path>();
         try (Stream<Path> walk = Files.walk(modelsDir.toPath())) {
             models = walk
@@ -182,22 +162,31 @@ public class ModelRepositoryCreator extends DefaultTask {
                     .filter(f -> isEndWith(f.toString()))
                     .collect(Collectors.toList());        
         }
-
+        
         // In einem ersten Durchlauf werden die Verzeichnisse eruiert, damit diese
         // als (lokales) Repository beim Kompilieren verwendet werden können.
         // Welches Problem löst das? Importieren lokale Modelle wiederum lokale Modelle,
         // werden diese entweder nicht gefunden (falls sie in keinem Online-Repo sind) oder
         // sie werden aus einem bestehenden/vorhanden Repository verwendet. Dies sollte 
         // m.E. nicht die Regel sein, weil sie ja geändert haben können.
+        String[] items = ignoredDirectories.split(";");
         Set<String> parentModelDirSet = new TreeSet<>();
         for (Path model : models) {
             if (model.toAbsolutePath().toString().contains("replaced")) {
                 continue;
             } 
+            
+            // Aus den zu ignorierenden Directories dürfen die Modelle auch nicht
+            // zum Kompilieren anderer Modell verwendet werden. Dazu ist models-ext
+            // da.
+            if (Arrays.asList(items).contains(model.getParent().getFileName().toString())) {
+                continue;
+            }
             parentModelDirSet.add(model.toFile().getAbsoluteFile().getParent());
         }
+        
         List<String> repositories = new ArrayList<>();
-        repositories.add("models-ext");
+        repositories.add(Paths.get(modelsDir.getParent(), "models-ext").toString());
         repositories.addAll(parentModelDirSet);
         repositories.addAll(Arrays.asList(modelRepos.split(";")));
 
@@ -213,13 +202,18 @@ public class ModelRepositoryCreator extends DefaultTask {
                 continue;
             }
             
-            TransferDescription td = getTransferDescriptionFromFileName(file.getAbsolutePath(), repositories.toArray(new String[0]));            
+            // Aus den zu ignorierenden Directories dürfen die Modelle nicht berücksichtigt werden. 
+            if (Arrays.asList(items).contains(modelPath.getParent().getFileName().toString())) {
+                continue;
+            }
+
+            TransferDescription td = getTransferDescription(modelPath, repositories.toArray(new String[0]));            
 
             // IMD output
             if (ilismeta) {
             	File ilismetaDir = Paths.get(modelsDir.getParent(), "ilismeta").toFile();            
             	File ilismetaFile = Paths.get(ilismetaDir.getAbsolutePath(), FilenameUtils.removeExtension(file.getName()) + ".xml").toFile();
-    			ch.interlis.ili2c.generator.Imd16Generator.generate(ilismetaFile, td, TransferDescription.getVersion());
+    			Imd16Generator.generate(ilismetaFile, td, TransferDescription.getVersion());
 		    }
 		                
             // Mehrere Modelle in einer ili-Datei.
@@ -312,65 +306,49 @@ public class ModelRepositoryCreator extends DefaultTask {
         ioxWriter.close();
         
         Settings settings = new Settings();
-        settings.setValue(Validator.SETTING_ILIDIRS, iliDirs.toString());
+        settings.setValue(Validator.SETTING_ILIDIRS, String.join(";", repositories));
         settings.setValue(Validator.SETTING_ALL_OBJECTS_ACCESSIBLE, Validator.TRUE);
         boolean valid = Validator.runValidation(outputFile.getAbsolutePath(), settings);
-        
         return valid;
     }
-    
-    private Path getIliDirs(String modelName) throws IOException {
-        Path targetPath = null;
+        
+    private TransferDescription getTransferDescription(String modelName) throws IOException, Ili2cException {
+        return getTransferDescription(modelName, null);
+    }
+
+    private TransferDescription getTransferDescription(String modelName, String[] respositories) throws IOException, Ili2cException {
         try (InputStream inputStream = ModelRepositoryCreator.class.getClassLoader().getResourceAsStream(modelName+".ili")) {
             if (inputStream == null) {
                 throw new IOException("Resource not found");
             }
 
             Path tempDirectory = Files.createTempDirectory("ili_");
-            targetPath = tempDirectory.resolve(modelName+".ili");
+            Path targetPath = tempDirectory.resolve(modelName+".ili");
             Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
             
-            return targetPath.getParent();
+            return getTransferDescription(targetPath, new String[] { targetPath.getParent().toString() });
         } catch (IOException e) {
             e.printStackTrace();
             throw new IOException(e);
-        }
+        }        
     }
     
-    // Methode wird nur zum Kompilieren von IliRepositoryXX benötigt.
-    // TODO: Abgrenzung / Synergien mit getTransferDescriptionFromFileName?
-    private TransferDescription getTransferDescriptionFromModelName(String iliDirs, String iliModelName) throws Ili2cException {
-        IliManager manager = new IliManager();
-        String repositories[] = new String[] { iliDirs };
-        manager.setRepositories(repositories);
-        ArrayList<String> modelNames = new ArrayList<String>();
-        modelNames.add(iliModelName);
-        Configuration config = manager.getConfig(modelNames, 2.3);
-        ch.interlis.ili2c.metamodel.TransferDescription iliTd = Ili2c.runCompiler(config);
-
-        if (iliTd == null) {
-            throw new IllegalArgumentException("INTERLIS compiler failed"); // TODO: can this be tested?
-        }
-        
-        return iliTd;
-    }
-    
-    private TransferDescription getTransferDescriptionFromFileName(String fileName, String[] repositories) throws Ili2cException {
+    private TransferDescription getTransferDescription(Path fileName, String[] respositories) throws IOException, Ili2cException {
         IliManager manager = new IliManager();        
-        manager.setRepositories(repositories);
+        manager.setRepositories(respositories);
         
         ArrayList<String> ilifiles = new ArrayList<String>();
-        ilifiles.add(fileName);
+        ilifiles.add(fileName.toString());
         Configuration config = manager.getConfigWithFiles(ilifiles);
-        ch.interlis.ili2c.metamodel.TransferDescription iliTd = Ili2c.runCompiler(config);
+        TransferDescription td = Ili2c.runCompiler(config);
                 
-        if (iliTd == null) {
+        if (td == null) {
             throw new IllegalArgumentException("INTERLIS compiler failed");
         }
         
-        return iliTd;
+        return td;
     }
-    
+
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
                 "[a-zA-Z0-9_+&*-]+)*@" +

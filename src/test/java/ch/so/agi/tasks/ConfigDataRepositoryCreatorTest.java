@@ -50,8 +50,8 @@ plugins {
 import ch.so.agi.tasks.ConfigDataRepositoryCreator
 
 task createConfigDataXml(type: ConfigDataRepositoryCreator) {
-    configDir = file('config')
-    dataFile = 'ilidata.xml'
+    configDirectory = file('config')
+    dataFile = file('ilidata.xml')
     owner = 'mailto:foo@bar.ch'
 }
 """;
