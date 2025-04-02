@@ -170,8 +170,13 @@ public class ModelRepositoryCreator extends DefaultTask {
         // sie werden aus einem bestehenden/vorhanden Repository verwendet. Dies sollte 
         // m.E. nicht die Regel sein, weil sie ja geändert haben können.
         String[] items = ignoredDirectories.split(";");
+        List<String> itemsList = Arrays.asList(items);
+        System.out.println("***** " + itemsList);
         Set<String> parentModelDirSet = new TreeSet<>();
         for (Path model : models) {
+            System.out.println("model: " + (model.getParent().getFileName().toString()));
+            
+            
             if (model.toAbsolutePath().toString().contains("replaced")) {
                 continue;
             } 
@@ -179,7 +184,7 @@ public class ModelRepositoryCreator extends DefaultTask {
             // Aus den zu ignorierenden Directories dürfen die Modelle auch nicht
             // zum Kompilieren anderer Modell verwendet werden. Dazu ist models-ext
             // da.
-            if (Arrays.asList(items).contains(model.getParent().getFileName().toString())) {
+            if (itemsList.contains(model.getParent().getFileName().toString())) {
                 continue;
             }
             parentModelDirSet.add(model.toFile().getAbsoluteFile().getParent());
