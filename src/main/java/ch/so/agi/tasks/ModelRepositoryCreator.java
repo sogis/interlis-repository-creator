@@ -197,6 +197,10 @@ public class ModelRepositoryCreator extends DefaultTask {
 
         int i = 1;
         for (Path modelPath : models) {
+            
+            System.out.println("modelPath: " + (modelPath.getParent().getFileName().toString()));
+
+            
             File file = modelPath.toFile();
             
             // Abgelöste Modelle werden nicht im Fileindex (ilimodels.xml) 
@@ -208,7 +212,7 @@ public class ModelRepositoryCreator extends DefaultTask {
             }
             
             // Aus den zu ignorierenden Directories dürfen die Modelle nicht berücksichtigt werden. 
-            if (Arrays.asList(items).contains(modelPath.getParent().getFileName().toString())) {
+            if (itemsList.contains(modelPath.getParent().getFileName().toString())) {
                 continue;
             }
 
