@@ -169,25 +169,22 @@ public class ModelRepositoryCreator extends DefaultTask {
         // werden diese entweder nicht gefunden (falls sie in keinem Online-Repo sind) oder
         // sie werden aus einem bestehenden/vorhanden Repository verwendet. Dies sollte 
         // m.E. nicht die Regel sein, weil sie ja geändert haben können.
-        String[] items = ignoredDirectories.split(";");
-        List<String> itemsList = Arrays.asList(items);
-        System.out.println("***** " + itemsList);
         Set<String> parentModelDirSet = new TreeSet<>();
-        for (Path model : models) {
-            System.out.println("model: " + (model.getParent().getFileName().toString()));
-            
-            
-            if (model.toAbsolutePath().toString().contains("replaced")) {
+        for (Path modelPath : models) {
+            if (modelPath.toAbsolutePath().toString().contains("replaced")) {
                 continue;
             } 
             
             // Aus den zu ignorierenden Directories dürfen die Modelle auch nicht
             // zum Kompilieren anderer Modell verwendet werden. Dazu ist models-ext
             // da.
-            if (itemsList.contains(model.getParent().getFileName().toString())) {
+            // Achtung: Es wird nur eine Substring-Prüfung durchgeführt.
+            String target = modelPath.toAbsolutePath().toString();
+            if (Arrays.stream(ignoredDirectories.split(";")).anyMatch(target::contains)) {
                 continue;
             }
-            parentModelDirSet.add(model.toFile().getAbsoluteFile().getParent());
+            
+            parentModelDirSet.add(modelPath.toFile().getAbsoluteFile().getParent());
         }
         
         List<String> repositories = new ArrayList<>();
@@ -197,10 +194,6 @@ public class ModelRepositoryCreator extends DefaultTask {
 
         int i = 1;
         for (Path modelPath : models) {
-            
-            System.out.println("modelPath: " + (modelPath.getParent().getFileName().toString()));
-
-            
             File file = modelPath.toFile();
             
             // Abgelöste Modelle werden nicht im Fileindex (ilimodels.xml) 
@@ -211,11 +204,15 @@ public class ModelRepositoryCreator extends DefaultTask {
                 continue;
             }
             
-            // Aus den zu ignorierenden Directories dürfen die Modelle nicht berücksichtigt werden. 
-            if (itemsList.contains(modelPath.getParent().getFileName().toString())) {
+            // Aus den zu ignorierenden Directories dürfen die Modelle auch nicht
+            // zum Kompilieren anderer Modell verwendet werden. Dazu ist models-ext
+            // da.
+            // Achtung: Es wird nur eine Substring-Prüfung durchgeführt.
+            String target = modelPath.toAbsolutePath().toString();
+            if (Arrays.stream(ignoredDirectories.split(";")).anyMatch(target::contains)) {
                 continue;
             }
-
+            
             TransferDescription td = getTransferDescription(modelPath, repositories.toArray(new String[0]));            
 
             // IMD output
