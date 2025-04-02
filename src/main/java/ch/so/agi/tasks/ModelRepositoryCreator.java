@@ -196,6 +196,8 @@ public class ModelRepositoryCreator extends DefaultTask {
         for (Path modelPath : models) {
             File file = modelPath.toFile();
             
+            System.out.println(file.getAbsolutePath().toString());
+            
             // Abgelöste Modelle werden nicht im Fileindex (ilimodels.xml) 
             // aufgelistet. Auch weil wir immer neue Modellnamen machen und
             // keine precursorVersion-Semantik haben.
@@ -208,10 +210,24 @@ public class ModelRepositoryCreator extends DefaultTask {
             // zum Kompilieren anderer Modell verwendet werden. Dazu ist models-ext
             // da.
             // Achtung: Es wird nur eine Substring-Prüfung durchgeführt.
-            String target = modelPath.toAbsolutePath().toString();
-            if (Arrays.stream(ignoredDirectories.split(";")).anyMatch(target::contains)) {
+            String target = file.getAbsolutePath().toString();
+            String[] items = ignoredDirectories.split(";");
+
+            // Check if any element is a substring of target
+            boolean found = false;
+            for (String item : items) {
+                if (target.contains(item)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
                 continue;
             }
+ 
+//            if (Arrays.stream(ignoredDirectories.split(";")).anyMatch(target::contains)) {
+//                continue;
+//            }
             
             TransferDescription td = getTransferDescription(modelPath, repositories.toArray(new String[0]));            
 
