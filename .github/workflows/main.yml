@@ -19,7 +19,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-          # cache: 'gradle' #Error: Cache service responded with 422
+          cache: 'gradle'
 
       - name: Build with Gradle
         run: ./gradlew clean build
